@@ -3126,8 +3126,9 @@ int f2fs_trim_fs(struct f2fs_sb_info *sbi, struct fstrim_range *range)
 	 * discard option. User configuration looks like using runtime discard
 	 * or periodic fstrim instead of it.
 	 */
-	if (f2fs_realtime_discard_enable(sbi))
-		goto out;
+	/* Since the below code may break the discard/trim feature in some Android ROM, so just comment it out.*/
+	// if (f2fs_realtime_discard_enable(sbi))
+	// 	goto out;
 
 	start_block = START_BLOCK(sbi, start_segno);
 	end_block = START_BLOCK(sbi, end_segno + 1);
