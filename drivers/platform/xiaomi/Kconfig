@@ -93,4 +93,11 @@ menu "Xiaomi board selection"
 		help
 		  Support for Mi 10
 
+	config TECHPACK_DISPLAY_HWC_OSS
+		bool "Set the physical size of the screen by hwc oss"
+		depends on MACH_XIAOMI_SM8250
+		help
+		  If you encounter screen display issue on Android 17
+		  (use OSS HWC) ROM, please select Y.
+
 endmenu

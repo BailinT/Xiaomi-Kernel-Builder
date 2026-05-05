@@ -11,6 +11,9 @@
 #include <linux/of_gpio.h>
 #include <linux/pwm.h>
 #include <video/mipi_display.h>
+#ifdef CONFIG_TECHPACK_DISPLAY_HWC_OSS
+#include <soc/qcom/socinfo.h>
+#endif
 
 #include "dsi_panel.h"
 #include "dsi_ctrl_hw.h"
@@ -2088,6 +2091,58 @@ error:
 	return rc;
 }
 
+#ifdef CONFIG_TECHPACK_DISPLAY_HWC_OSS
+static void set_oss_panel_width_height(struct dsi_panel *panel)
+{
+	int panel_width = 0, panel_height = 0;
+	struct dsi_panel_phy_props *props = &panel->phy_props;
+	int hw_platform_ver = get_hw_version_platform();
+
+	switch (hw_platform_ver) {
+		case HARDWARE_PLATFORM_UMI:
+		case HARDWARE_PLATFORM_CMI:
+		case HARDWARE_PLATFORM_THYME:
+		case HARDWARE_PLATFORM_CAS:
+			panel_width = 71;
+			panel_height = 154;
+			break;
+		case HARDWARE_PLATFORM_LMI:
+		case HARDWARE_PLATFORM_ALIOTH:
+		case HARDWARE_PLATFORM_MUNCH:
+			panel_width = 70;
+			panel_height = 155;
+			break;
+		case HARDWARE_PLATFORM_APOLLO:
+			panel_width = 70;
+			panel_height = 154;
+			break;
+		case HARDWARE_PLATFORM_ELISH:
+		case HARDWARE_PLATFORM_ENUMA:
+			panel_width = 147;
+			panel_height = 236;
+			break;
+		case HARDWARE_PLATFORM_DAGU:
+			panel_width = 166;
+			panel_height = 266;
+			break;
+		case HARDWARE_PLATFORM_PSYCHE:
+			panel_width = 65;
+			panel_height = 145;
+			break;
+		case HARDWARE_PLATFORM_PIPA:
+			panel_width = 148;
+			panel_height = 237;
+			break;
+	}
+
+	props->panel_width_mm = panel_width;
+	props->panel_height_mm = panel_height;
+
+	pr_info("[moon] set panel on width [%d] height [%d]\n",
+		props->panel_width_mm, props->panel_height_mm);
+}
+#endif
+
 static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 {
 	int rc = 0;
@@ -2118,6 +2173,9 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 		props->panel_height_mm = val;
 	}
 
+#ifdef CONFIG_TECHPACK_DISPLAY_HWC_OSS
+	set_oss_panel_width_height(panel);
+#endif
 	str = utils->get_property(utils->data,
 			"qcom,mdss-dsi-panel-orientation", NULL);
 	if (!str) {
