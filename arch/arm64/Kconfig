@@ -1671,7 +1671,7 @@ config BUILD_ARM64_DT_OVERLAY
 
 config BOOT_INFO
 	bool "Boot information from bootloader"
-	default y if BOARD_XIAOMI
+	default y if MACH_XIAOMI
 	help
 	  On embedded linux device, we try to collect more information from
 	  bootloader to kernel. eg. powerup reason.
@@ -1765,7 +1765,7 @@ endif
 
 config HWCONF_MANAGER
 	bool "Hardware configuration and monitor information"
-	default y if BOARD_XIAOMI
+	default y if MACH_XIAOMI
 	help
 	  It provides all kinds of components configuration information and
 	  monitor values.
