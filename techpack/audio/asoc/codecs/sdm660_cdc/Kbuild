@@ -77,7 +77,7 @@ ifdef CONFIG_SND_SOC_DIGITAL_CDC_LEGACY
 	DIGITAL_CDC_OBJS += msm-digital-cdc-legacy.o
 	DIGITAL_CDC_OBJS += msm-digital-cdc-legacy-regmap.o
 endif
-LINUX_INC +=	-Iinclude/linux
+LINUX_INC +=	-I $(srctree)/include/linux
 
 INCS +=		$(COMMON_INC) \
 		$(UAPI_INC)

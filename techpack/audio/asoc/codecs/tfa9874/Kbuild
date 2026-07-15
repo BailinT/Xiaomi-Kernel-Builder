@@ -79,7 +79,7 @@ ifdef CONFIG_SND_SOC_TFA9874
 	#TFA9874_OBJS += src/tfa_debug.o
 endif
 
-LINUX_INC += -Iinclude/linux
+LINUX_INC += -I $(srctree)/include/linux
 
 INCS +=	$(COMMON_INC) \
 	$(UAPI_INC) \

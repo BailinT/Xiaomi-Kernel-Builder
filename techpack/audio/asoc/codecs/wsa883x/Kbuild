@@ -62,7 +62,7 @@ ifdef CONFIG_SND_SOC_WSA883X
 	WSA883X_OBJS += wsa883x-temp-sensor.o
 endif
 
-LINUX_INC +=	-Iinclude/linux
+LINUX_INC +=	-I $(srctree)/include/linux
 
 INCS +=		$(COMMON_INC) \
 		$(UAPI_INC)

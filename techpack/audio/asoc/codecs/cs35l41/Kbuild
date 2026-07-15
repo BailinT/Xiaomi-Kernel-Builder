@@ -80,7 +80,7 @@ ifdef CONFIG_SND_SOC_CS35L41
 	CS35L41_OBJS += send_data_to_xlog.o
 endif
 
-LINUX_INC +=	-Iinclude/linux
+LINUX_INC +=	-I $(srctree)/include/linux
 
 INCS +=		$(COMMON_INC) \
 		$(UAPI_INC)
