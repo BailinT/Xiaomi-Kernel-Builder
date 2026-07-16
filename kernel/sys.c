@@ -1273,6 +1273,7 @@ SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 			pr_info("fake uname: %s/%d release=%s\n",
 				current->comm, current->pid, tmp.release);
 		}
+	}
 	up_read(&uts_sem);
 	if (copy_to_user(name, &tmp, sizeof(tmp)))
 		return -EFAULT;
