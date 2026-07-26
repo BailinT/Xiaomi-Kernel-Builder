@@ -228,7 +228,6 @@ build_target() {
             -e PERF_HUMANTASK \
             -d LTO_CLANG \
             -e LTO_NONE \
-            -d SHADOW_CALL_STACK \
             -e XIAOMI_MIUI \
             -d MI_MEMORY_SYSFS \
             -e TASK_DELAY_ACCT \
