@@ -22,10 +22,7 @@
 #include <linux/usb/usbpd.h>
 #include <linux/pmic-voter.h>
 #include "usbpd.h"
-
-#ifdef CONFIG_PS5169
 #include "ps5169.h"
-#endif
 
 enum usbpd_state {
 	PE_UNKNOWN,
