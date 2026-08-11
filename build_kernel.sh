@@ -224,7 +224,6 @@ build_target() {
             -e PACKAGE_RUNTIME_INFO \
             -e BINDER_OPT \
             -e KPERFEVENTS \
-            -e MILLET \
             -e PERF_HUMANTASK \
             -d LTO_CLANG \
             -e LTO_NONE \
@@ -237,7 +236,6 @@ build_target() {
             -e BOOTUP_RECLAIM \
             -e MI_RECLAIM \
             -e RTMM \
-            -e MIHW \
             -e MILLET_CGROUP \
             -e MILLET_SIG \
             -e MILLET_BINDER \
@@ -248,6 +246,14 @@ build_target() {
             -e BINDER_PRIO \
             -d REKERNEL \
             -d REKERNEL_NETWORK
+    fi
+
+    # 4. AOSP configurations
+    if [ "$OS_TYPE" == "aosp" ]; then
+        echo "[*] Injecting AOSP specific configurations..."
+        scripts/config --file "${OUT_DIR}/.config" \
+            -e REKERNEL \
+            -e REKERNEL_NETWORK
     fi
 
     # We always need to re-evaluate dependencies because BBG is injected unconditionally
