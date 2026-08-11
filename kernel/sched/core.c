@@ -6465,6 +6465,7 @@ void show_state_filter(unsigned long state_filter)
 		debug_show_all_locks();
 }
 
+#ifdef CONFIG_XIAOMI_MIUI
 void show_state_filter_single(unsigned long state_filter)
 {
 	struct task_struct *g, *p;
@@ -6492,6 +6493,7 @@ void show_state_filter_single(unsigned long state_filter)
 	}
 	rcu_read_unlock();
 }
+#endif
 
 /**
  * init_idle - set up an idle thread for a given CPU
