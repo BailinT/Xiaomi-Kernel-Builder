@@ -1,30 +1,30 @@
 #!/bin/bash
 set -e
 
-bash build.sh psyche
-bash build.sh thyme
-bash build.sh umi
-bash build.sh munch
-bash build.sh lmi
-bash build.sh cmi
-bash build.sh cas
-bash build.sh apollo
-bash build.sh alioth
-bash build.sh elish
-bash build.sh enuma
-bash build.sh dagu
-bash build.sh pipa
+bash build_kernel.sh psyche
+bash build_kernel.sh thyme
+bash build_kernel.sh umi
+bash build_kernel.sh munch
+bash build_kernel.sh lmi
+bash build_kernel.sh cmi
+bash build_kernel.sh cas
+bash build_kernel.sh apollo
+bash build_kernel.sh alioth
+bash build_kernel.sh elish
+bash build_kernel.sh enuma
+bash build_kernel.sh dagu
+bash build_kernel.sh pipa
 
-bash build.sh psyche ksu
-bash build.sh thyme ksu
-bash build.sh umi ksu
-bash build.sh munch ksu
-bash build.sh lmi ksu
-bash build.sh cmi ksu
-bash build.sh cas ksu
-bash build.sh apollo ksu
-bash build.sh alioth ksu
-bash build.sh elish ksu
-bash build.sh enuma ksu
-bash build.sh dagu ksu
-bash build.sh pipa ksu
+bash build_kernel.sh psyche ksu
+bash build_kernel.sh thyme ksu
+bash build_kernel.sh umi ksu
+bash build_kernel.sh munch ksu
+bash build_kernel.sh lmi ksu
+bash build_kernel.sh cmi ksu
+bash build_kernel.sh cas ksu
+bash build_kernel.sh apollo ksu
+bash build_kernel.sh alioth ksu
+bash build_kernel.sh elish ksu
+bash build_kernel.sh enuma ksu
+bash build_kernel.sh dagu ksu
+bash build_kernel.sh pipa ksu
