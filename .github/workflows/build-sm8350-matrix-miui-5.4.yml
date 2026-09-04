@@ -1,0 +1,198 @@
+name: 内核构建 - 5.4 全机型矩阵 (SM8350 全家族)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: '构建完成后发布到 GitHub Releases (是否发布 Release)'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-matrix:
+    name: Build ${{ matrix.label }} (${{ matrix.device }}) | MIUI | ReSukiSU+SuSFS
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { device: haydn, label: "Redmi_K40_Pro" }
+          - { device: vili,  label: "Redmi_K40_ProPlus_11TPro" }
+          - { device: venus, label: "Xiaomi_11" }
+          - { device: star,  label: "Xiaomi_11_Ultra" }
+          - { device: odin,  label: "Xiaomi_MIX4" }
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+
+      # Device env（job 级 env 可引用 matrix；复合 action 直接读取）
+      DEVICE_NAME : ${{ matrix.label }}
+      DEVICE_CODENAME : ${{ matrix.device }}
+
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+      EXTRA_CMDS : "LD=ld.lld"
+
+      # 5.4 SM8350 内核源（BailinT fork 自 EndCredits，MIUI/澎湃 全系支持）
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_xiaomi_sm8350-miui.git"
+      KERNEL_BRANCH : "ASB-2024-10-05"
+
+      # 与 venus（小米11，同平台 5.4 Stable 先例）一致的工具链
+      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
+      CLANG_BRANCH : "lineage-20.0"
+
+      GCC_GNU : false
+      GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
+      GCC_64_BRANCH : "android12L-release"
+      GCC_32_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9.git"
+      GCC_32_BRANCH : "android12L-release"
+
+      DEFCONFIG_SOURCE: ""
+      DEFCONFIG_NAME : "vendor/lahaina-qgki_defconfig"
+      DEFCONFIG_ORIGIN_IMAGE: ""
+      DEFCONFIG_FROM_BOOT : false
+
+      KERNELSU_SOURCE : ""
+      KERNELSU_BRANCH : ""
+
+      KERNELSU_AUTO_GET : "true"
+      KERNELSU_AUTO_FORK : "resukisu"
+
+      SUSFS_ENABLE : true
+      SUSFS_FIXED : false
+
+      AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
+      AK3_BRANCH : "master"
+
+      BOOT_SOURCE : ""
+
+      NEED_DTBO : false
+      NEED_SAFE_DTBO : false
+
+      ROM_TEXT : "miui"
+
+      PYTHON_VERSION: "3"
+
+      PACK_METHOD: "Anykernel3"
+      PACK_KMODULES: "false"
+
+      KERNELSU_METHOD: "shell"
+      KERNELSU_SUS_PATCH: "false"
+
+      PATCHES_SOURCE: ""
+      PATCHES_BRANCH: ""
+
+      SUSFS_FOLDER_FIXED: ""
+      SUSFS_PATCH_FIXED: ""
+
+      REKERNEL_ENABLE: "false"
+      DROIDSPACES_ENABLE: "false"
+      NOMOUNT_ENABLE: "false"
+
+      HOOK_METHOD: "syscall"
+
+      KERNEL_PATCH: "false"
+
+      KPM_ENABLE: "false"
+      KPM_INLINE: "false"
+      KPM_KPATCH_NEXT: "false"
+      KPM_PATCH_SOURCE: ""
+
+      BASEBAND_GUARD_ENABLE: "false"
+      BASEBAND_GUARD_BOOT: "false"
+
+      GENERATE_DTB: "false"
+      GENERATE_CHIP: "qcom"
+
+      BUILD_DEBUGGER: "true"
+      SKIP_PATCH: "true"
+
+      BUILD_OTHER_CONFIG: "true"
+      MERGE_CONFIG_FILES: "vendor/${{ matrix.device }}_QGKI.config,vendor/xiaomi_QGKI.config"
+
+      FREE_MORE_SPACE: "false"
+
+    steps:
+      - name: ⏰ Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 👤 署名
+        run: |
+          echo "By 抖音王德发刷机"
+
+      - name: ⌛️ Compilation environment preparation
+        uses: ./.github/workflows/build-env
+
+      - name: ⚙️ Get necessary tools
+        uses: ./.github/workflows/build-ready
+
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧰 Patch Kernel of Re:Kernel
+        uses: ./.github/workflows/patch-rekernel
+
+      - name: 💿 Patch Kernel of Droidspaces
+        uses: ./.github/workflows/patch-droidspaces
+
+      - name: 🔒 Patch Kernel of Baseband Guard
+        uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🚀 Build Process
+        uses: ./.github/workflows/build-process
+
+      - name: 🔩 Pack Process
+        uses: ./.github/workflows/pack-process
+
+      - name: ✏️ Upload Artifacts
+        uses: ./.github/workflows/upload-files
+
+  release:
+    name: Publish GitHub Release
+    if: ${{ github.event.inputs.publish_release == 'true' || github.event.inputs.publish_release == true }}
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Generate Release Info
+        id: vars
+        run: |
+          echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=v$(date +'%Y%m%d')-${GITHUB_SHA::8}-sm8350" >> $GITHUB_OUTPUT
+          echo "SHA_SHORT=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_kernels
+          pattern: Kernel-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: "SM8350 MIUI 内核 - ${{ steps.vars.outputs.BUILD_DATE }} (${{ steps.vars.outputs.SHA_SHORT }})"
+          body: |
+            ## SM8350 (5.4) MIUI/澎湃 内核自动发布
+            
+            - **构建日期:** ${{ steps.vars.outputs.BUILD_DATE }}
+            - **提交哈希:** `${{ steps.vars.outputs.SHA_SHORT }}`
+            - **支持设备:** `haydn (K40 Pro)`、`vili (K40 Pro+/11T Pro)`、`venus (小米11)`、`star (小米11 Ultra)`、`odin (小米MIX 4)`
+            - **Root 方案:** ReSukiSU + SuSFS（Inline Hook）
+            - **目标系统:** 仅 MIUI / 澎湃 OS（本仓库不构建 AOSP 变体）
+            - **命名规则:** `<代号>-miui-<时间戳>-Anykernel3.zip`，只刷 boot 分区，刷前备份原厂 boot
+            
+            By 抖音王德发刷机
+          files: all_kernels/*.zip
