@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build-matrix:
-    name: Build ${{ matrix.device }} | ${{ matrix.ksu && 'KSU' || 'NoKSU' }} (AOSP + MIUI)
+    name: Build ${{ matrix.device }} | ${{ matrix.ksu && 'KSU' || 'NoKSU' }} | MIUI
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -79,6 +79,7 @@ jobs:
           if [ "${{ matrix.ksu }}" = "true" ]; then
             ARGS="$ARGS ksu"
           fi
+          ARGS="$ARGS miui"
           
           echo "Executing command: ./build_kernel.sh $ARGS"
           ./build_kernel.sh $ARGS
@@ -130,7 +131,6 @@ jobs:
             ---
             ### 刷机包分类指南 / Flashable ZIP Instructions:
             - **MIUI**: 适用于原厂 MIUI / HyperOS 或基于 MIUI 修改的第三方 ROM。
-            - **AOSP**: 适用于 LineageOS 等类原生 AOSP ROM。
             - **ReSukiSU-SuSFS**: 集成 ReSukiSU 与 SuSFS。
             - **NoKernelSU**: 原版纯净内核，支持自行使用 Magisk 或 APatch 刷入。
           files: all_kernels/*.zip
