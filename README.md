@@ -6,7 +6,50 @@
 **English:**  
 The kernel source code is still under development and may cause some unpredictable problems. Please use it with caution.  
 
+---
+
+## 支持的设备（4.19 / SM8250）/ Supported Devices (4.19)
+| 设备代号 / Codename  | 设备名称 / Device Name            |
+|---------------------|-----------------------------------|
+| psyche              | Xiaomi 12X                        |
+| thyme               | Xiaomi 10S                        |
+| umi                 | Xiaomi 10                         |
+| munch               | Redmi K40S / POCO F4              |
+| lmi                 | Redmi K30 Pro / POCO F2 Pro       |
+| cmi                 | Xiaomi 10 Pro                     |
+| cas                 | Xiaomi 10 Ultra                   |
+| apollo              | Xiaomi 10T / Redmi K30S Ultra     |
+| alioth              | Xiaomi 11X / POCO F3 / Redmi K40  |
+| elish               | Xiaomi Pad 5 Pro                  |
+| enuma               | Xiaomi Pad 5 Pro 5G               |
+| dagu                | Xiaomi Pad 5 Pro 12.4             |
+| pipa                | Xiaomi Pad 6                      |
+
+---
+
+## 支持的设备（5.4 / SM8350 骁龙888）/ Supported Devices (5.4)
+
+| 设备代号 / Codename | 设备名称 / Device Name | 构建入口 / Workflow | 状态 |
+|---------------------|------------------------|---------------------|------|
+| haydn               | Redmi K40 Pro / 小米11X Pro / Mi 11i | 5.4 单编 haydn + 5.4 全机型矩阵 | ✅ |
+| vili                | Redmi K40 Pro+ / 小米11T Pro | 5.4 全机型矩阵 | ✅ |
+| venus               | 小米11 / Xiaomi 11 | 5.4 全机型矩阵 | ✅ |
+| star                | 小米11 Ultra / Xiaomi 11 Ultra | 5.4 全机型矩阵 | ✅ |
+| odin                | 小米MIX 4 / Xiaomi MIX 4 | 5.4 全机型矩阵 | ✅ |
+| mars                | 小米11 Pro / Xiaomi 11 Pro | 小米11 Pro mars 测试（专用） | 🧪 |
+| cetus               | 机型待考证 / TBD | 暂未收录 | ➖ |
+
+**中文:**  
+5.4 系列走仓库内 Non-GKI 构建引擎（源码外挂）：矩阵/单编基于 EndCredits 树（5.4.283），小米11 Pro 基于 MiYume/Hushangda 树（5.4.302）。Root 统一 ReSukiSU + SuSFS，**仅适配 MIUI / 澎湃 OS**。产物 `<代号>-miui-<时间戳>-Anykernel3.zip`，只刷 boot 分区，刷前备份原厂 boot。  
+**English:**  
+The 5.4 series uses the in-repo Non-GKI build engine (external kernel sources): matrix/single builds are based on the EndCredits tree (5.4.283), Xiaomi 11 Pro on the MiYume/Hushangda tree (5.4.302). Root: ReSukiSU + SuSFS. **MIUI / HyperOS only.** Output: `<codename>-miui-<timestamp>-Anykernel3.zip`, boot partition only — back up your stock boot first.
+
+---
+
+
 ## 目录 / Table of Contents
+- [支持的设备（4.19 / SM8250）](#支持的设备419--sm8250--supported-devices-419)  
+- [支持的设备（5.4 / SM8350）](#支持的设备54--sm8350-骁龙888-supported-devices-54)  
 - [简介 / Introduction](#简介--introduction)  
 - [特性 / Features](#特性--features)  
 - [社区 / Community](#社区--community)  
@@ -68,46 +111,6 @@ Below are some of the key features:
 
 **English:**  
 Join ApartTUSITU's QQ Group: [700675046](https://qm.qq.com/q/Md7nXA3Toa)。  
-
----
-
-## 支持的设备（4.19 / SM8250）/ Supported Devices (4.19)
-| 设备代号 / Codename  | 设备名称 / Device Name            |
-|---------------------|-----------------------------------|
-| psyche              | Xiaomi 12X                        |
-| thyme               | Xiaomi 10S                        |
-| umi                 | Xiaomi 10                         |
-| munch               | Redmi K40S / POCO F4              |
-| lmi                 | Redmi K30 Pro / POCO F2 Pro       |
-| cmi                 | Xiaomi 10 Pro                     |
-| cas                 | Xiaomi 10 Ultra                   |
-| apollo              | Xiaomi 10T / Redmi K30S Ultra     |
-| alioth              | Xiaomi 11X / POCO F3 / Redmi K40  |
-| elish               | Xiaomi Pad 5 Pro                  |
-| enuma               | Xiaomi Pad 5 Pro 5G               |
-| dagu                | Xiaomi Pad 5 Pro 12.4             |
-| pipa                | Xiaomi Pad 6                      |
-
----
-
-## 支持的设备（5.4 / SM8350 骁龙888）/ Supported Devices (5.4)
-
-| 设备代号 / Codename | 设备名称 / Device Name | 构建入口 / Workflow | 状态 |
-|---------------------|------------------------|---------------------|------|
-| haydn               | Redmi K40 Pro / 小米11X Pro / Mi 11i | 5.4 单编 haydn + 5.4 全机型矩阵 | ✅ |
-| vili                | Redmi K40 Pro+ / 小米11T Pro | 5.4 全机型矩阵 | ✅ |
-| venus               | 小米11 / Xiaomi 11 | 5.4 全机型矩阵 | ✅ |
-| star                | 小米11 Ultra / Xiaomi 11 Ultra | 5.4 全机型矩阵 | ✅ |
-| odin                | 小米MIX 4 / Xiaomi MIX 4 | 5.4 全机型矩阵 | ✅ |
-| mars                | 小米11 Pro / Xiaomi 11 Pro | 小米11 Pro mars 测试（专用） | 🧪 |
-| cetus               | 机型待考证 / TBD | 暂未收录 | ➖ |
-
-**中文:**  
-5.4 系列走仓库内 Non-GKI 构建引擎（源码外挂）：矩阵/单编基于 EndCredits 树（5.4.283），小米11 Pro 基于 MiYume/Hushangda 树（5.4.302）。Root 统一 ReSukiSU + SuSFS，**仅适配 MIUI / 澎湃 OS**。产物 `<代号>-miui-<时间戳>-Anykernel3.zip`，只刷 boot 分区，刷前备份原厂 boot。  
-**English:**  
-The 5.4 series uses the in-repo Non-GKI build engine (external kernel sources): matrix/single builds are based on the EndCredits tree (5.4.283), Xiaomi 11 Pro on the MiYume/Hushangda tree (5.4.302). Root: ReSukiSU + SuSFS. **MIUI / HyperOS only.** Output: `<codename>-miui-<timestamp>-Anykernel3.zip`, boot partition only — back up your stock boot first.
-
----
 
 ---
 
