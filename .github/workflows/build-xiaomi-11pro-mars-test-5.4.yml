@@ -1,0 +1,139 @@
+name: 内核构建 - 小米11 Pro mars 测试 (5.4 HyperOS)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-kernel:
+    name: Xiaomi 11 Pro (mars) | MIUI/HyperOS | ReSukiSU+SuSFS
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+
+      # Device env
+      DEVICE_NAME : "Xiaomi_11_Pro"
+      DEVICE_CODENAME : "mars"
+
+      # MiYume/hushangda 树为单文件 defconfig + LLVM=1 全家桶（README 要求 clang 18.1.8 = Neutron）
+      CUSTOM_CMDS : ""
+      EXTRA_CMDS : "LLVM=1 LLVM_IAS=1"
+
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_xiaomi_sm8350_miyume.git"
+      KERNEL_BRANCH : "main"
+
+      # Neutron clang 18.1.x（build-env antman 模式，-S=10032024 固定快照）
+      CLANG_SOURCE : "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
+      CLANG_BRANCH : ""
+
+      GCC_GNU : false
+      GCC_64_SOURCE : ""
+      GCC_64_BRANCH : ""
+      GCC_32_SOURCE : ""
+      GCC_32_BRANCH : ""
+
+      # star/mars 共用 star_defconfig（仓库 README 明示）
+      DEFCONFIG_SOURCE: ""
+      DEFCONFIG_NAME : "star_defconfig"
+      DEFCONFIG_ORIGIN_IMAGE: ""
+      DEFCONFIG_FROM_BOOT : false
+
+      KERNELSU_SOURCE : ""
+      KERNELSU_BRANCH : ""
+
+      KERNELSU_AUTO_GET : "true"
+      KERNELSU_AUTO_FORK : "resukisu"
+
+      SUSFS_ENABLE : true
+      SUSFS_FIXED : false
+
+      AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
+      AK3_BRANCH : "master"
+
+      BOOT_SOURCE : ""
+
+      NEED_DTBO : false
+      NEED_SAFE_DTBO : false
+
+      ROM_TEXT : "hyperos"
+
+      PYTHON_VERSION: "3"
+
+      PACK_METHOD: "Anykernel3"
+      PACK_KMODULES: "false"
+
+      KERNELSU_METHOD: "shell"
+      KERNELSU_SUS_PATCH: "false"
+
+      PATCHES_SOURCE: ""
+      PATCHES_BRANCH: ""
+
+      SUSFS_FOLDER_FIXED: ""
+      SUSFS_PATCH_FIXED: ""
+
+      REKERNEL_ENABLE: "false"
+      DROIDSPACES_ENABLE: "false"
+      NOMOUNT_ENABLE: "false"
+
+      HOOK_METHOD: "syscall"
+
+      KERNEL_PATCH: "false"
+
+      KPM_ENABLE: "false"
+      KPM_INLINE: "false"
+      KPM_KPATCH_NEXT: "false"
+      KPM_PATCH_SOURCE: ""
+
+      BASEBAND_GUARD_ENABLE: "false"
+      BASEBAND_GUARD_BOOT: "false"
+
+      GENERATE_DTB: "false"
+      GENERATE_CHIP: "qcom"
+
+      BUILD_DEBUGGER: "true"
+      SKIP_PATCH: "true"
+
+      # 单文件 defconfig，不需要碎片合并
+      BUILD_OTHER_CONFIG: "false"
+      MERGE_CONFIG_FILES: ""
+
+      FREE_MORE_SPACE: "false"
+
+    steps:
+      - name: ⏰ Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 👤 署名
+        run: |
+          echo "By 抖音王德发刷机"
+
+      - name: ⌛️ Compilation environment preparation
+        uses: ./.github/workflows/build-env
+
+      - name: ⚙️ Get necessary tools
+        uses: ./.github/workflows/build-ready
+
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧰 Patch Kernel of Re:Kernel
+        uses: ./.github/workflows/patch-rekernel
+
+      - name: 💿 Patch Kernel of Droidspaces
+        uses: ./.github/workflows/patch-droidspaces
+
+      - name: 🔒 Patch Kernel of Baseband Guard
+        uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🚀 Build Process
+        uses: ./.github/workflows/build-process
+
+      - name: 🔩 Pack Process
+        uses: ./.github/workflows/pack-process
+
+      - name: ✏️ Upload Artifacts
+        uses: ./.github/workflows/upload-files
