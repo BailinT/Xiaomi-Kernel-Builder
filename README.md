@@ -71,7 +71,7 @@ Join ApartTUSITU's QQ Group: [700675046](https://qm.qq.com/q/Md7nXA3Toa)。
 
 ---
 
-## 支持的设备 / Supported Devices
+## 支持的设备（4.19 / SM8250）/ Supported Devices (4.19)
 | 设备代号 / Codename  | 设备名称 / Device Name            |
 |---------------------|-----------------------------------|
 | psyche              | Xiaomi 12X                        |
@@ -90,14 +90,35 @@ Join ApartTUSITU's QQ Group: [700675046](https://qm.qq.com/q/Md7nXA3Toa)。
 
 ---
 
+## 支持的设备（5.4 / SM8350 骁龙888）/ Supported Devices (5.4)
+
+| 设备代号 / Codename | 设备名称 / Device Name | 构建入口 / Workflow | 状态 |
+|---------------------|------------------------|---------------------|------|
+| haydn               | Redmi K40 Pro / 小米11X Pro / Mi 11i | 5.4 单编 haydn + 5.4 全机型矩阵 | ✅ |
+| vili                | Redmi K40 Pro+ / 小米11T Pro | 5.4 全机型矩阵 | ✅ |
+| venus               | 小米11 / Xiaomi 11 | 5.4 全机型矩阵 | ✅ |
+| star                | 小米11 Ultra / Xiaomi 11 Ultra | 5.4 全机型矩阵 | ✅ |
+| odin                | 小米MIX 4 / Xiaomi MIX 4 | 5.4 全机型矩阵 | ✅ |
+| mars                | 小米11 Pro / Xiaomi 11 Pro | 小米11 Pro mars 测试（专用） | 🧪 |
+| cetus               | 机型待考证 / TBD | 暂未收录 | ➖ |
+
+**中文:**  
+5.4 系列走仓库内 Non-GKI 构建引擎（源码外挂）：矩阵/单编基于 EndCredits 树（5.4.283），小米11 Pro 基于 MiYume/Hushangda 树（5.4.302）。Root 统一 ReSukiSU + SuSFS，**仅适配 MIUI / 澎湃 OS**。产物 `<代号>-miui-<时间戳>-Anykernel3.zip`，只刷 boot 分区，刷前备份原厂 boot。  
+**English:**  
+The 5.4 series uses the in-repo Non-GKI build engine (external kernel sources): matrix/single builds are based on the EndCredits tree (5.4.283), Xiaomi 11 Pro on the MiYume/Hushangda tree (5.4.302). Root: ReSukiSU + SuSFS. **MIUI / HyperOS only.** Output: `<codename>-miui-<timestamp>-Anykernel3.zip`, boot partition only — back up your stock boot first.
+
+---
+
+---
+
 ## 构建方法 / Build Instructions
 
 ### 快速构建 / Quick Build
 **中文:**  
 1. fork 本仓库(别忘了点个 Star~)  
 2. 进入 **Actions**  
-3. 如果你要为所有支持的设备编译内核，找到 `Build All Devices Kernel (Matrix Parallel + Release)`，点击 `Run workflow`  
-4. 如果你要为单个设备编译内核，找到 `Build Kernel`， 点击 `Run workflow` 并选择必要内容  
+3. 如果你要为所有支持的设备编译内核，找到 `内核构建 - 4.19 全机型矩阵 (SM8250 全家族)`，点击 `Run workflow`  
+4. 如果你要为单个设备编译内核，找到 `内核构建 - 4.19 单机型 (SM8250 全家族)`， 点击 `Run workflow` 并选择必要内容  
 
 **English:**  
 1. Fork this repo (don’t forget to leave a Star~)  
