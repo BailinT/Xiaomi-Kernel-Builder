@@ -3,6 +3,11 @@ name: 内核构建 - 小米11 Pro mars 测试 (5.4 HyperOS)
 on:
   workflow_dispatch:
 
+# 必须在 workflow 级设置：步骤级 $GITHUB_ENV 只影响后续步骤，而 build-ready 先执行
+env:
+  CLEAN_HOOK_ENABLE: "false"
+  KSU_SETUP_ENABLE: "false"
+
 jobs:
   build-kernel:
     name: Xiaomi 11 Pro (mars) | MIUI/HyperOS | ReSukiSU+SuSFS
@@ -114,11 +119,9 @@ jobs:
       - name: ⚙️ Get necessary tools
         uses: ./.github/workflows/build-ready
 
-      # MiYume 树预集成 ReSukiSU+SuSFS，信任树内集成（外部 susfs 底补丁对该树 hunk 失败率过高）
-      - name: ✅ 使用树内 KSU/SuSFS 集成（跳过外部补丁）
+      # MiYume 树预集成 ReSukiSU+SuSFS：CLEAN_HOOK/KSU_SETUP 开关已在 workflow 级 env 关闭
+      - name: ✅ 使用树内 KSU/SuSFS 集成
         run: |
-          echo "CLEAN_HOOK_ENABLE=false" >> $GITHUB_ENV
-          echo "KSU_SETUP_ENABLE=false" >> $GITHUB_ENV
           echo "Using tree-builtin ReSukiSU + SuSFS integration."
 
       - name: 🧰 Patch Kernel of Re:Kernel
