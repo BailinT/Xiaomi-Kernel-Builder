@@ -1,4 +1,4 @@
-name: Build All Devices Kernel (Matrix Parallel + Release)
+name: 内核构建 - 4.19 全机型矩阵 (SM8250 全家族)
 
 on:
   workflow_dispatch:

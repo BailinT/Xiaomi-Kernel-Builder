@@ -1,4 +1,4 @@
-name: Build Kernel
+name: 内核构建 - 4.19 单机型 (SM8250 全家族)
 
 on:
   workflow_dispatch:
