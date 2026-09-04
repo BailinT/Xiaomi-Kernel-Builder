@@ -114,11 +114,11 @@ jobs:
       - name: ⚙️ Get necessary tools
         uses: ./.github/workflows/build-ready
 
-      - name: 🪝 Patch Kernel of SUSFS
-        uses: ./.github/workflows/patch-susfs
-
-      - name: 🔗 Patch for no-kprobe
-        uses: ./.github/workflows/patch-no-kprobe
+      # MiYume 树预集成 ReSukiSU+SuSFS，信任树内集成（外部 susfs 底补丁对该树 hunk 失败率过高）
+      - name: ✅ 使用树内 KSU/SuSFS 集成（跳过外部补丁）
+        run: |
+          echo "CLEAN_HOOK_ENABLE=false" >> $GITHUB_ENV
+          echo "Using tree-builtin ReSukiSU + SuSFS integration."
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
