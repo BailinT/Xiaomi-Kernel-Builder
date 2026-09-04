@@ -118,6 +118,7 @@ jobs:
       - name: ✅ 使用树内 KSU/SuSFS 集成（跳过外部补丁）
         run: |
           echo "CLEAN_HOOK_ENABLE=false" >> $GITHUB_ENV
+          echo "KSU_SETUP_ENABLE=false" >> $GITHUB_ENV
           echo "Using tree-builtin ReSukiSU + SuSFS integration."
 
       - name: 🧰 Patch Kernel of Re:Kernel
