@@ -26,7 +26,7 @@ jobs:
       DEVICE_CODENAME : "phoenix"
 
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-      EXTRA_CMDS : "LD=ld.lld KCFLAGS=-Wno-error"
+      EXTRA_CMDS : ""
 
       # 内核源：engstk blu_spark 树（一加 8 系设备 dts 官方未开源，仅此树有 dts/vendor/oplus 全套
       # instantnoodle/instantnoodlep/kebab/lemonades overlay；4.19.325，2026-09 仍在维护）
