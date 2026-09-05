@@ -25,7 +25,7 @@ jobs:
       DEVICE_NAME : "OnePlus_Nord"
       DEVICE_CODENAME : "avicii"
 
-      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-android-"
       EXTRA_CMDS : "LD=ld.lld"
 
       # 内核源：crd 整合树（官方源码 + oplus Kconfig 剥离可构建，5.4.284 最接近 ColorOS 14 固件 5.4.254；
