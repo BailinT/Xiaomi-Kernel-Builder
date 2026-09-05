@@ -26,7 +26,7 @@ jobs:
       DEVICE_CODENAME : "x50pro"
 
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-      EXTRA_CMDS : "LD=ld.lld"
+      EXTRA_CMDS : ""
 
       # realme 官方源修复树（X50 Pro/Play 专属 x50pro_defconfig，4.19.157，MODULE_SIG 已关；
       # 官方 AndroidS 树 dts/vendor 悬空，此树已修复为真身）
