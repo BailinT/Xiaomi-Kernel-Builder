@@ -1,0 +1,194 @@
+name: 内核构建 - Redmi Note 10 Pro sweet (4.14 MIUI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: '构建完成后发布到 GitHub Releases (是否发布 Release)'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Redmi_Note_10_Pro (sweet) | MIUI | ReSukiSU+SuSFS
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+
+      # 一加 8 系 base dtb + dtbo 方案：boot 内核带基础 kona dtb，设备 overlay 留在 stock dtbo 分区不动
+      DEVICE_NAME : "Redmi_Note_10_Pro"
+      DEVICE_CODENAME : "sweet"
+
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+      EXTRA_CMDS : "LD=ld.lld"
+
+      # 内核源：engstk blu_spark 树（一加 8 系设备 dts 官方未开源，仅此树有 dts/vendor/oplus 全套
+      # instantnoodle/instantnoodlep/kebab/lemonades overlay；4.19.325，2026-09 仍在维护）
+      KERNEL_SOURCE : "https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git"
+      KERNEL_BRANCH : "sweet-r-oss"
+
+      # ZyC-Clang 16：小米 4.19 SM8250 线 13 机型全绿同款工具链（clang 12 r416183b
+      # 不认 engstk 树的 -Wno-align-mismatch/-Wno-unused-but-set-variable，-Werror 直接炸）
+      CLANG_SOURCE : "https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260807-release/Clang-16.0.6-20260807.tar.gz"
+      CLANG_BRANCH : ""
+
+      GCC_GNU : false
+      GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
+      GCC_64_BRANCH : "android12L-release"
+      GCC_32_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9.git"
+      GCC_32_BRANCH : "android12L-release"
+
+      # engstk 整合树自带完整 defconfig，无需碎片合并
+      DEFCONFIG_SOURCE: ""
+      DEFCONFIG_NAME : "vendor/sweet_user_defconfig"
+      DEFCONFIG_ORIGIN_IMAGE: ""
+      DEFCONFIG_FROM_BOOT : false
+
+      KERNELSU_SOURCE : ""
+      KERNELSU_BRANCH : ""
+
+      KERNELSU_AUTO_GET : "true"
+      KERNELSU_AUTO_FORK : "resukisu"
+
+      SUSFS_ENABLE : true
+      SUSFS_FIXED : false
+
+      AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
+      AK3_BRANCH : "master"
+
+      BOOT_SOURCE : ""
+
+      # 本树出 Image.gz-dtb（全量 dtb 追加），pack 直接取用，无需 GENERATE_DTB
+      NEED_DTBO : false
+      NEED_SAFE_DTBO : false
+
+      ROM_TEXT : "miui"
+
+      PYTHON_VERSION: "3"
+
+      PACK_METHOD: "Anykernel3"
+      PACK_KMODULES: "false"
+
+      KERNELSU_METHOD: "shell"
+      KERNELSU_SUS_PATCH: "false"
+
+      PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
+      PATCHES_BRANCH: ""
+
+      SUSFS_FOLDER_FIXED: ""
+      SUSFS_PATCH_FIXED: ""
+
+      REKERNEL_ENABLE: "false"
+      DROIDSPACES_ENABLE: "false"
+      NOMOUNT_ENABLE: "false"
+
+      HOOK_METHOD: "syscall"
+
+      KERNEL_PATCH: "false"
+
+      KPM_ENABLE: "false"
+      KPM_INLINE: "false"
+      KPM_KPATCH_NEXT: "false"
+      KPM_PATCH_SOURCE: ""
+
+      BASEBAND_GUARD_ENABLE: "false"
+      BASEBAND_GUARD_BOOT: "false"
+
+      # engstk 树 overlay 布局下基础 dtb 编在 dts/vendor/oplus/（kona/kona-v2/kona-v2.1）
+      GENERATE_DTB: "false"
+      GENERATE_CHIP: "oplus"
+
+      BUILD_DEBUGGER: "true"
+      SKIP_PATCH: "true"
+
+      BUILD_OTHER_CONFIG: "false"
+      MERGE_CONFIG_FILES: ""
+
+      FREE_MORE_SPACE: "false"
+
+    steps:
+      - name: ⏰ Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 👤 署名
+        run: |
+          echo "By 抖音王德发刷机"
+
+      - name: ⌛️ Compilation environment preparation
+        uses: ./.github/workflows/build-env
+
+      - name: ⚙️ Get necessary tools
+        uses: ./.github/workflows/build-ready
+
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧰 Patch Kernel of Re:Kernel
+        uses: ./.github/workflows/patch-rekernel
+
+      - name: 💿 Patch Kernel of Droidspaces
+        uses: ./.github/workflows/patch-droidspaces
+
+      - name: 🔒 Patch Kernel of Baseband Guard
+        uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🚀 Build Process
+        uses: ./.github/workflows/build-process
+
+      - name: 🔩 Pack Process
+        uses: ./.github/workflows/pack-process
+
+      - name: ✏️ Upload Artifacts
+        uses: ./.github/workflows/upload-files
+
+  release:
+    name: Publish GitHub Release
+    if: ${{ github.event.inputs.publish_release == 'true' || github.event.inputs.publish_release == true }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Generate Release Info
+        id: vars
+        run: |
+          echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=v$(date +'%Y%m%d')-${GITHUB_SHA::8}-sweet" >> $GITHUB_OUTPUT
+          echo "SHA_SHORT=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_kernels
+          pattern: Kernel-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: "Redmi_Note_10_Pro 内核 - ${{ steps.vars.outputs.BUILD_DATE }} (${{ steps.vars.outputs.SHA_SHORT }})"
+          body: |
+            ## Redmi Note 10 Pro (sweet, SM7150/sdmmagpie)（4.14.180）MIUI 内核
+
+            - **构建日期:** ${{ steps.vars.outputs.BUILD_DATE }}
+            - **提交哈希:** `${{ steps.vars.outputs.SHA_SHORT }}`
+            - **支持机型:** Redmi Note 10 Pro / Note 10 Pro Max
+            - **目标系统:** MIUI / 澎湃 OS（boot 内核替换）
+            - **Root 方案:** ReSukiSU + SuSFS（Inline Hook）
+            - **命名规则:** 刷 boot 分区，刷前备份原厂 boot
+
+            By 抖音王德发刷机
+          files: all_kernels/*.zip
