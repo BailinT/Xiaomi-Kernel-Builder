@@ -30,7 +30,7 @@ jobs:
 
       # 内核源：engstk blu_spark 树（一加 8 系设备 dts 官方未开源，仅此树有 dts/vendor/oplus 全套
       # instantnoodle/instantnoodlep/kebab/lemonades overlay；4.19.325，2026-09 仍在维护）
-      KERNEL_SOURCE : "https://github.com/EndCredits/android_kernel_xiaomi_sm7250.git"
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_xiaomi_sm7250.git"
       KERNEL_BRANCH : "android-4.19"
 
       # ZyC-Clang 16：小米 4.19 SM8250 线 13 机型全绿同款工具链（clang 12 r416183b
