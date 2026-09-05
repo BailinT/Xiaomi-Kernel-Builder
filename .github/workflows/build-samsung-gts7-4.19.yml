@@ -107,7 +107,7 @@ jobs:
       SKIP_PATCH: "true"
 
       BUILD_OTHER_CONFIG: "true"
-      MERGE_CONFIG_FILES: "vendor/samsung/kona-sec-common.config,vendor/samsung/gts7l.config"
+      MERGE_CONFIG_FILES: "vendor/samsung/kona-sec-common.config,vendor/samsung/gts7l.config,vendor/samsung/bailint-release.config"
 
       FREE_MORE_SPACE: "false"
 
