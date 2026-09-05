@@ -81,11 +81,15 @@ runs:
                 echo "======================="
                 make O=out ARCH="${{ env.KERNEL_ARCH }}" olddefconfig
             fi
+            if [[ "${{ env.LOCKDEP_FORCE_OFF }}" == "true" ]]; then
+              echo "[+] BailinT guard v2: config state around LOCKDEP:"
+              grep -n "LOCKDEP\|LOCK_DEBUGGING\|PROVE_LOCK" out/.config | head -20 || true
+            fi
             if [[ "${{ env.LOCKDEP_FORCE_OFF }}" == "true" ]] && grep -q "^CONFIG_LOCKDEP=y" out/.config; then
-              echo "[+] BailinT guard: forcing CONFIG_LOCKDEP off post-olddefconfig"
+              echo "[+] BailinT guard v2: sed AFTER olddefconfig (syncconfig will honor)"
               sed -i 's/^CONFIG_LOCKDEP=y/# CONFIG_LOCKDEP is not set/' out/.config
               sed -i 's/^CONFIG_LOCK_DEBUGGING_SUPPORT=y/# CONFIG_LOCK_DEBUGGING_SUPPORT is not set/' out/.config
-              make CC="ccache clang" O=out ARCH="${{ env.KERNEL_ARCH }}" olddefconfig
+              grep -n "LOCKDEP\|LOCK_DEBUGGING" out/.config | head -8 || true
             fi
           fi
 
