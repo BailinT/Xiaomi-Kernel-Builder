@@ -76,7 +76,7 @@ jobs:
       KERNELSU_METHOD: "shell"
       KERNELSU_SUS_PATCH: "false"
 
-      PATCHES_SOURCE: ""
+      PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
       PATCHES_BRANCH: "realme-x"
 
       SUSFS_FOLDER_FIXED: ""
