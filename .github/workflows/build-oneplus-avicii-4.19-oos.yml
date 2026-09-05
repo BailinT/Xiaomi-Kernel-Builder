@@ -25,7 +25,7 @@ jobs:
       DEVICE_NAME : "OnePlus_Nord"
       DEVICE_CODENAME : "avicii"
 
-      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-android-"
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
       EXTRA_CMDS : "LD=ld.lld"
 
       # 内核源：crd 整合树（官方源码 + oplus Kconfig 剥离可构建，5.4.284 最接近 ColorOS 14 固件 5.4.254；
@@ -137,6 +137,12 @@ jobs:
 
       - name: 🔒 Patch Kernel of Baseband Guard
         uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🔗 gnu- 工具链接名补齐（树用 -no-integrated-as + --prefix 查 gnu-as）
+        run: |
+          cd $GITHUB_WORKSPACE/gcc-64/bin
+          for t in as ld objcopy nm ar strip objdump readelf; do ln -sf aarch64-linux-android-$t aarch64-linux-gnu-$t; done
+          ls -al aarch64-linux-gnu-as aarch64-linux-gnu-ld
 
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
