@@ -30,7 +30,7 @@ jobs:
 
       # 内核源：crd 整合树（官方源码 + oplus Kconfig 剥离可构建，5.4.284 最接近 ColorOS 14 固件 5.4.254；
       # 官方 OnePlusOSS 镜像 sched_assist 等目录为悬空 symlink，各分支均不可独立构建，故用 crd）
-      KERNEL_SOURCE : "https://github.com/crdroidandroid/android_kernel_oneplus_sm8350.git"
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_oneplus_sm8350-crd.git"
       KERNEL_BRANCH : "14.0"
 
       # 官方 build.config.common 同款工具链 clang-r416183b
