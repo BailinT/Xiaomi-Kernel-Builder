@@ -107,7 +107,7 @@ jobs:
       BUILD_OTHER_CONFIG: "false"
       MERGE_CONFIG_FILES: ""
 
-      FREE_MORE_SPACE: "false"
+      FREE_MORE_SPACE: "true"
 
     steps:
       - name: ⏰ Checkout repository
