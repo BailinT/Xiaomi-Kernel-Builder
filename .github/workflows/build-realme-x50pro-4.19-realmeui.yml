@@ -30,7 +30,7 @@ jobs:
 
       # realme 官方源修复树（X50 Pro/Play 专属 x50pro_defconfig，4.19.157，MODULE_SIG 已关；
       # 官方 AndroidS 树 dts/vendor 悬空，此树已修复为真身）
-      KERNEL_SOURCE : "https://github.com/loume2366/kernel_realme_sm8250.git"
+      KERNEL_SOURCE : "https://github.com/BailinT/kernel_realme_sm8250.git"
       KERNEL_BRANCH : "official_stock_fixed"
 
       # 官方 build.config.common 同款工具链 clang-r416183b
@@ -56,7 +56,7 @@ jobs:
       KERNELSU_AUTO_FORK : "resukisu"
 
       SUSFS_ENABLE : true
-      SUSFS_FIXED : false
+      SUSFS_FIXED : true
 
       AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
       AK3_BRANCH : "master"
@@ -77,10 +77,10 @@ jobs:
       KERNELSU_SUS_PATCH: "false"
 
       PATCHES_SOURCE: ""
-      PATCHES_BRANCH: ""
+      PATCHES_BRANCH: "realme-x"
 
       SUSFS_FOLDER_FIXED: ""
-      SUSFS_PATCH_FIXED: ""
+      SUSFS_PATCH_FIXED: "susfs_fix_loume_sm8250"
 
       REKERNEL_ENABLE: "false"
       DROIDSPACES_ENABLE: "false"
