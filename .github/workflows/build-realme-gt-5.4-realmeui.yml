@@ -56,7 +56,7 @@ jobs:
       KERNELSU_AUTO_FORK : "resukisu"
 
       SUSFS_ENABLE : true
-      SUSFS_FIXED : false
+      SUSFS_FIXED : true
 
       AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
       AK3_BRANCH : "master"
@@ -76,11 +76,11 @@ jobs:
       KERNELSU_METHOD: "shell"
       KERNELSU_SUS_PATCH: "false"
 
-      PATCHES_SOURCE: ""
-      PATCHES_BRANCH: ""
+      PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
+      PATCHES_BRANCH: "realme-x"
 
       SUSFS_FOLDER_FIXED: ""
-      SUSFS_PATCH_FIXED: ""
+      SUSFS_PATCH_FIXED: "susfs_fix_realmegt"
 
       REKERNEL_ENABLE: "false"
       DROIDSPACES_ENABLE: "false"
