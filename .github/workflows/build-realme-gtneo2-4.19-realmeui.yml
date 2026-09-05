@@ -26,7 +26,7 @@ jobs:
       DEVICE_CODENAME : "gtneo2"
 
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-      EXTRA_CMDS : "LD=ld.lld"
+      EXTRA_CMDS : ""
 
       # 内核源：crd 整合树（官方源码 + oplus Kconfig 剥离可构建，5.4.284 最接近 ColorOS 14 固件 5.4.254；
       # 官方 OnePlusOSS 镜像 sched_assist 等目录为悬空 symlink，各分支均不可独立构建，故用 crd）
