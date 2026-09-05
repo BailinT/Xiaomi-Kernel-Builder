@@ -35,8 +35,8 @@ jobs:
 
       # ZyC-Clang 16：小米 4.19 SM8250 线 13 机型全绿同款工具链（clang 12 r416183b
       # 不认 engstk 树的 -Wno-align-mismatch/-Wno-unused-but-set-variable，-Werror 直接炸）
-      CLANG_SOURCE : "https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260807-release/Clang-16.0.6-20260807.tar.gz"
-      CLANG_BRANCH : ""
+      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
+      CLANG_BRANCH : "lineage-20.0"
 
       GCC_GNU : false
       GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
