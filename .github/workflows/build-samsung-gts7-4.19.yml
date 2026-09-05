@@ -1,0 +1,203 @@
+name: 内核构建 - Samsung Galaxy Tab S7 全系 (4.19 OneUI/LOS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: '构建完成后发布到 GitHub Releases (是否发布 Release)'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Samsung_Tab_S7 (gts7l/gts7lwifi) | OneUI | ReSukiSU+SuSFS
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+
+      # 三星 Tab S7（SM-T870/T875）：LineageOS 官方维护树，4.19.325，
+      # dts 在 arch/arm64/boot/dts/samsung/gts7l|gts7xl（非 vendor/ 下）
+      DEVICE_NAME : "Samsung_Tab_S7"
+      DEVICE_CODENAME : "gts7l"
+
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+      EXTRA_CMDS : "LD=ld.lld"
+
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_samsung_sm8250.git"
+      KERNEL_BRANCH : "lineage-23.2"
+
+      # ZyC-Clang 16：4.19 线验证过的兜底工具链（树 build.config 标 r416183b/clang12）
+      CLANG_SOURCE : "https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260807-release/Clang-16.0.6-20260807.tar.gz"
+      CLANG_BRANCH : ""
+
+      GCC_GNU : false
+      GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
+      GCC_64_BRANCH : "android12L-release"
+      GCC_32_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9.git"
+      GCC_32_BRANCH : "android12L-release"
+
+      # LOS 三星组合配置：kona_defconfig 基底 + 三星安全公共碎片 + 机型碎片
+      DEFCONFIG_SOURCE: ""
+      DEFCONFIG_NAME : "vendor/kona_defconfig"
+      DEFCONFIG_ORIGIN_IMAGE: ""
+      DEFCONFIG_FROM_BOOT : false
+
+      KERNELSU_SOURCE : ""
+      KERNELSU_BRANCH : ""
+
+      KERNELSU_AUTO_GET : "true"
+      KERNELSU_AUTO_FORK : "resukisu"
+
+      SUSFS_ENABLE : true
+      SUSFS_FIXED : true
+
+      AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
+      AK3_BRANCH : "master"
+
+      BOOT_SOURCE : ""
+
+      # 三星 kona 世代 dtb 在 boot 镜像内；dtbo 分区（BOARD_DTBOIMG）保持原厂不动
+      NEED_DTBO : false
+      NEED_SAFE_DTBO : false
+
+      ROM_TEXT : "oneui"
+
+      PYTHON_VERSION: "3"
+
+      PACK_METHOD: "Anykernel3"
+      PACK_KMODULES: "false"
+
+      KERNELSU_METHOD: "shell"
+      KERNELSU_SUS_PATCH: "false"
+
+      PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
+      PATCHES_BRANCH: "samsung-gts7"
+
+      SUSFS_FOLDER_FIXED: ""
+      SUSFS_PATCH_FIXED: "susfs_fix_samsung_sm8250"
+
+      REKERNEL_ENABLE: "false"
+      DROIDSPACES_ENABLE: "false"
+      NOMOUNT_ENABLE: "false"
+
+      HOOK_METHOD: "syscall"
+
+      KERNEL_PATCH: "false"
+
+      KPM_ENABLE: "false"
+      KPM_INLINE: "false"
+      KPM_KPATCH_NEXT: "false"
+      KPM_PATCH_SOURCE: ""
+
+      BASEBAND_GUARD_ENABLE: "false"
+      BASEBAND_GUARD_BOOT: "false"
+
+      # 三星 dts 编在 dts/samsung/gts7l/（子目录）——引擎 pack 只认
+      # dts/vendor/<chip>/*.dtb 非递归 glob，Build 后由暂存步搬运
+      GENERATE_DTB: "true"
+      GENERATE_CHIP: "samsung"
+
+      BUILD_DEBUGGER: "true"
+      SKIP_PATCH: "true"
+
+      BUILD_OTHER_CONFIG: "true"
+      MERGE_CONFIG_FILES: "vendor/samsung/kona-sec-common.config,vendor/samsung/gts7l.config"
+
+      FREE_MORE_SPACE: "false"
+
+    steps:
+      - name: ⏰ Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 👤 署名
+        run: |
+          echo "By 抖音王德发刷机"
+
+      - name: ⌛️ Compilation environment preparation
+        uses: ./.github/workflows/build-env
+
+      - name: ⚙️ Get necessary tools
+        uses: ./.github/workflows/build-ready
+
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧰 Patch Kernel of Re:Kernel
+        uses: ./.github/workflows/patch-rekernel
+
+      - name: 💿 Patch Kernel of Droidspaces
+        uses: ./.github/workflows/patch-droidspaces
+
+      - name: 🔒 Patch Kernel of Baseband Guard
+        uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🚀 Build Process
+        uses: ./.github/workflows/build-process
+
+      - name: 🗂 Stage Samsung DTB (gts7l → dts/vendor/samsung)
+        run: |
+          BOOT_DIR=$GITHUB_WORKSPACE/device_kernel/out/arch/arm64/boot
+          echo "[+] dtbs built under dts/samsung/:"
+          find $BOOT_DIR/dts/samsung -name '*.dtb' | head -30
+          mkdir -p $BOOT_DIR/dts/vendor/samsung
+          find $BOOT_DIR/dts/samsung/gts7l -name '*.dtb' -exec cp -fp {} $BOOT_DIR/dts/vendor/samsung/ \;
+          echo "[+] staged for pack:"
+          ls -al $BOOT_DIR/dts/vendor/samsung/
+
+      - name: 🔩 Pack Process
+        uses: ./.github/workflows/pack-process
+
+      - name: ✏️ Upload Artifacts
+        uses: ./.github/workflows/upload-files
+
+  release:
+    name: Publish GitHub Release
+    if: ${{ github.event.inputs.publish_release == 'true' || github.event.inputs.publish_release == true }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Generate Release Info
+        id: vars
+        run: |
+          echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=v$(date +'%Y%m%d')-${GITHUB_SHA::8}-gts7l" >> $GITHUB_OUTPUT
+          echo "SHA_SHORT=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_kernels
+          pattern: Kernel-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: "Samsung Galaxy Tab S7 (gts7l) OneUI 内核 - ${{ steps.vars.outputs.BUILD_DATE }} (${{ steps.vars.outputs.SHA_SHORT }})"
+          body: |
+            ## Samsung Galaxy Tab S7 (SM-T870/T875, gts7l) 内核
+
+            - **构建日期:** ${{ steps.vars.outputs.BUILD_DATE }}
+            - **提交哈希:** `${{ steps.vars.outputs.SHA_SHORT }}`
+            - **内核版本:** 4.19.325（LineageOS 树 lineage-23.2）
+            - **支持机型:** Galaxy Tab S7 (gts7l) —— gts7lwifi/gts7xl/gts7xlwifi 改 MERGE_CONFIG_FILES 碎片即可
+            - **Root 方案:** ReSukiSU + SuSFS（Inline Hook）
+            - **刷法:** Odin/AP 刷 boot 或 AK3 zip 刷 boot；刷前备份原厂 boot；KNOX 熔断不可逆
+
+            By 抖音王德发刷机
+          files: all_kernels/*.zip
