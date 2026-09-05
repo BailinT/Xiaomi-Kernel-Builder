@@ -1,0 +1,191 @@
+name: 内核构建 - realme X50 Pro/Play x50pro (4.19 realmeUI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: '构建完成后发布到 GitHub Releases (是否发布 Release)'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Realme_X50_Pro (x50pro) | realmeUI | ReSukiSU+SuSFS
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+
+      # 设备（boot-only 内核对 9/9Pro 平台通用，dtb 留在 vendor_boot 不动）
+      DEVICE_NAME : "Realme_X50_Pro"
+      DEVICE_CODENAME : "x50pro"
+
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+      EXTRA_CMDS : "LD=ld.lld"
+
+      # realme 官方源修复树（X50 Pro/Play 专属 x50pro_defconfig，4.19.157，MODULE_SIG 已关；
+      # 官方 AndroidS 树 dts/vendor 悬空，此树已修复为真身）
+      KERNEL_SOURCE : "https://github.com/loume2366/kernel_realme_sm8250.git"
+      KERNEL_BRANCH : "official_stock_fixed"
+
+      # 官方 build.config.common 同款工具链 clang-r416183b
+      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
+      CLANG_BRANCH : "lineage-20.0"
+
+      GCC_GNU : false
+      GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
+      GCC_64_BRANCH : "android12L-release"
+      GCC_32_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9.git"
+      GCC_32_BRANCH : "android12L-release"
+
+      # crd 14.0 已提交完整 defconfig（官方 generate_defconfig.sh 产物），无需碎片合并
+      DEFCONFIG_SOURCE: ""
+      DEFCONFIG_NAME : "vendor/x50pro_defconfig"
+      DEFCONFIG_ORIGIN_IMAGE: ""
+      DEFCONFIG_FROM_BOOT : false
+
+      KERNELSU_SOURCE : ""
+      KERNELSU_BRANCH : ""
+
+      KERNELSU_AUTO_GET : "true"
+      KERNELSU_AUTO_FORK : "resukisu"
+
+      SUSFS_ENABLE : true
+      SUSFS_FIXED : false
+
+      AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
+      AK3_BRANCH : "master"
+
+      BOOT_SOURCE : ""
+
+      NEED_DTBO : false
+      NEED_SAFE_DTBO : false
+
+      ROM_TEXT : "realmeui"
+
+      PYTHON_VERSION: "3"
+
+      PACK_METHOD: "Anykernel3"
+      PACK_KMODULES: "false"
+
+      KERNELSU_METHOD: "shell"
+      KERNELSU_SUS_PATCH: "false"
+
+      PATCHES_SOURCE: ""
+      PATCHES_BRANCH: ""
+
+      SUSFS_FOLDER_FIXED: ""
+      SUSFS_PATCH_FIXED: ""
+
+      REKERNEL_ENABLE: "false"
+      DROIDSPACES_ENABLE: "false"
+      NOMOUNT_ENABLE: "false"
+
+      HOOK_METHOD: "syscall"
+
+      KERNEL_PATCH: "false"
+
+      KPM_ENABLE: "false"
+      KPM_INLINE: "false"
+      KPM_KPATCH_NEXT: "false"
+      KPM_PATCH_SOURCE: ""
+
+      BASEBAND_GUARD_ENABLE: "false"
+      BASEBAND_GUARD_BOOT: "false"
+
+      GENERATE_DTB: "true"
+      GENERATE_CHIP: "qcom"
+
+      BUILD_DEBUGGER: "true"
+      SKIP_PATCH: "true"
+
+      BUILD_OTHER_CONFIG: "false"
+      MERGE_CONFIG_FILES: ""
+
+      FREE_MORE_SPACE: "false"
+
+    steps:
+      - name: ⏰ Checkout repository
+        uses: actions/checkout@v6
+
+      - name: 👤 署名
+        run: |
+          echo "By 抖音王德发刷机"
+
+      - name: ⌛️ Compilation environment preparation
+        uses: ./.github/workflows/build-env
+
+      - name: ⚙️ Get necessary tools
+        uses: ./.github/workflows/build-ready
+
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧰 Patch Kernel of Re:Kernel
+        uses: ./.github/workflows/patch-rekernel
+
+      - name: 💿 Patch Kernel of Droidspaces
+        uses: ./.github/workflows/patch-droidspaces
+
+      - name: 🔒 Patch Kernel of Baseband Guard
+        uses: ./.github/workflows/patch-baseband-guard
+
+      - name: 🚀 Build Process
+        uses: ./.github/workflows/build-process
+
+      - name: 🔩 Pack Process
+        uses: ./.github/workflows/pack-process
+
+      - name: ✏️ Upload Artifacts
+        uses: ./.github/workflows/upload-files
+
+  release:
+    name: Publish GitHub Release
+    if: ${{ github.event.inputs.publish_release == 'true' || github.event.inputs.publish_release == true }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Generate Release Info
+        id: vars
+        run: |
+          echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=v$(date +'%Y%m%d')-${GITHUB_SHA::8}-x50pro" >> $GITHUB_OUTPUT
+          echo "SHA_SHORT=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_kernels
+          pattern: Kernel-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: "realme X50 Pro realmeUI 内核 - ${{ steps.vars.outputs.BUILD_DATE }} (${{ steps.vars.outputs.SHA_SHORT }})"
+          body: |
+            ## realme X50 Pro / X50 Pro Play (RMX2075/RMX2077, SM8250) realmeUI 内核（4.19.157）
+            
+            - **构建日期:** ${{ steps.vars.outputs.BUILD_DATE }}
+            - **提交哈希:** `${{ steps.vars.outputs.SHA_SHORT }}`
+            - **支持机型:** realme X50 Pro / X50 Pro Play（realmeUI 2.0~4.0 全代同版本内核）
+            - **目标系统:** realme UI（boot-only，基础 dtb 随包，stock dtbo 分区不动）
+            - **Root 方案:** ReSukiSU + SuSFS（Inline Hook）
+            - **命名规则:** 只刷 boot 分区，刷前备份原厂 boot
+            
+            By 抖音王德发刷机
+          files: all_kernels/*.zip
