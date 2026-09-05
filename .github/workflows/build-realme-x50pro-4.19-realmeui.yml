@@ -138,6 +138,13 @@ jobs:
       - name: 🔒 Patch Kernel of Baseband Guard
         uses: ./.github/workflows/patch-baseband-guard
 
+      - name: 🔗 Oplus flattened-tree symlink (kernel/msm-4.19 → root)
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          ln -sfn .. kernel/msm-4.19
+          echo "[+] kernel/msm-4.19 -> root (slabtrace/charger 相对 include 适配)"
+          ls kernel/msm-4.19/mm/internal.h
+
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
 
