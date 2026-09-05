@@ -8,23 +8,55 @@ on:
         required: true
         type: boolean
         default: true
+      only_device:
+        description: '只构建指定机型 (代号，留空=全矩阵)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
 
 jobs:
+  matrix-prepare:
+    name: 生成机型矩阵
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - name: Generate filtered matrix
+        id: gen
+        run: |
+          cat > /tmp/all.json <<'EOF'
+          [
+            { "device": "haydn", "label": "Redmi_K40_Pro" },
+            { "device": "vili", "label": "Redmi_K40_ProPlus_11TPro" },
+            { "device": "venus", "label": "Xiaomi_11" },
+            { "device": "star", "label": "Xiaomi_11_Ultra" },
+            { "device": "odin", "label": "Xiaomi_MIX4" },
+            { "device": "cetus", "label": "Xiaomi_MIX_FOLD" }
+          ]
+          EOF
+          ONLY="${{ github.event.inputs.only_device }}"
+          if [ -n "$ONLY" ]; then
+            jq -c --arg d "$ONLY" 'map(select(.device == $d))' /tmp/all.json > /tmp/m.json
+            if [ "$(jq length /tmp/m.json)" -eq 0 ]; then
+              echo "::error::未知机型代号: $ONLY (可用: haydn/vili/venus/star/odin/cetus)"
+              exit 1
+            fi
+          else
+            cp /tmp/all.json /tmp/m.json
+          fi
+          echo "matrix=$(jq -c . /tmp/m.json)" >> $GITHUB_OUTPUT
+
   build-matrix:
     name: Build ${{ matrix.label }} (${{ matrix.device }}) | MIUI | ReSukiSU+SuSFS
+    needs: matrix-prepare
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { device: haydn, label: "Redmi_K40_Pro" }
-          - { device: vili,  label: "Redmi_K40_ProPlus_11TPro" }
-          - { device: venus, label: "Xiaomi_11" }
-          - { device: star,  label: "Xiaomi_11_Ultra" }
-          - { device: odin,  label: "Xiaomi_MIX4" }
+        include: ${{ fromJson(needs.matrix-prepare.outputs.matrix) }}
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
       CCACHE_NOHASHDIR: "true"
@@ -189,7 +221,7 @@ jobs:
             
             - **构建日期:** ${{ steps.vars.outputs.BUILD_DATE }}
             - **提交哈希:** `${{ steps.vars.outputs.SHA_SHORT }}`
-            - **支持设备:** `haydn (K40 Pro)`、`vili (K40 Pro+/11T Pro)`、`venus (小米11)`、`star (小米11 Ultra)`、`odin (小米MIX 4)`
+            - **支持设备:** `haydn (K40 Pro)`、`vili (K40 Pro+/11T Pro)`、`venus (小米11)`、`star (小米11 Ultra)`、`odin (小米MIX 4)`、`cetus (MIX FOLD 初代折叠)`
             - **Root 方案:** ReSukiSU + SuSFS（Inline Hook）
             - **目标系统:** 仅 MIUI / 澎湃 OS（本仓库不构建 AOSP 变体）
             - **命名规则:** `<代号>-miui-<时间戳>-Anykernel3.zip`，只刷 boot 分区，刷前备份原厂 boot
