@@ -102,7 +102,7 @@ jobs:
 
       # engstk 树 overlay 布局下基础 dtb 编在 dts/vendor/oplus/（kona/kona-v2/kona-v2.1）
       GENERATE_DTB: "false"
-      GENERATE_CHIP: "oplus"
+      GENERATE_CHIP: "qcom"
 
       BUILD_DEBUGGER: "true"
       SKIP_PATCH: "true"
