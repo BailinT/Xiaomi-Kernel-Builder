@@ -31,7 +31,7 @@ jobs:
       KERNEL_SOURCE : "https://github.com/BailinT/kernel_xiaomi_cepheus.git"
       KERNEL_BRANCH : "sixteen"
 
-      CLANG_SOURCE : "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-Linux-X64.tar.xz"
+      CLANG_SOURCE : "https://github.com/ZyCromerZ/Clang/releases/download/18.0.0-20230830-release/Clang-18.0.0-20230830.tar.gz"
       CLANG_BRANCH : ""
 
       GCC_GNU : false
