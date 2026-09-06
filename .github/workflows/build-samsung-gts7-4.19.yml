@@ -147,10 +147,10 @@ jobs:
       - name: 🗂 Stage Samsung DTB (gts7l → dts/vendor/samsung)
         run: |
           BOOT_DIR=$GITHUB_WORKSPACE/device_kernel/out/arch/arm64/boot
-          echo "[+] dtbs built under dts/samsung/:"
-          find $BOOT_DIR/dts/samsung -name '*.dtb' | head -30
+          echo "[+] kona base dtbs built under dts/vendor/qcom/:"
+          ls -al $BOOT_DIR/dts/vendor/qcom/kona*.dtb || true
           mkdir -p $BOOT_DIR/dts/vendor/samsung
-          find $BOOT_DIR/dts/samsung/gts7l -name '*.dtb' -exec cp -fp {} $BOOT_DIR/dts/vendor/samsung/ \;
+          cp -fp $BOOT_DIR/dts/vendor/qcom/kona.dtb $BOOT_DIR/dts/vendor/qcom/kona-v2.dtb $BOOT_DIR/dts/vendor/qcom/kona-v2.1.dtb $BOOT_DIR/dts/vendor/samsung/
           echo "[+] staged for pack:"
           ls -al $BOOT_DIR/dts/vendor/samsung/
 
