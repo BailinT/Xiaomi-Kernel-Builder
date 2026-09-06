@@ -25,14 +25,14 @@ jobs:
       DEVICE_CODENAME : "cepheus"
 
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-      EXTRA_CMDS : ""
+      EXTRA_CMDS : "LLVM=1 LLVM_IAS=1"
 
-      # 社区维护树（balgxmr cepheus 树，4.14.353）
+      # 社区维护树（balgxmr cepheus 树 4.14.353，clang17+LLVM_IAS 配方=成品 build.sh）
       KERNEL_SOURCE : "https://github.com/BailinT/kernel_xiaomi_cepheus.git"
       KERNEL_BRANCH : "sixteen"
 
-      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
-      CLANG_BRANCH : "lineage-20.0"
+      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r530567.git"
+      CLANG_BRANCH : "lineage-21"
 
       GCC_GNU : false
       GCC_64_SOURCE : "https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git"
