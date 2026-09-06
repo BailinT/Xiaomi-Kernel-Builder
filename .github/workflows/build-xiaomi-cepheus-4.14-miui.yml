@@ -28,7 +28,7 @@ jobs:
       EXTRA_CMDS : ""
 
       # 社区维护树（balgxmr cepheus 树，4.14.353）
-      KERNEL_SOURCE : "https://github.com/balgxmr/kernel_xiaomi_cepheus.git"
+      KERNEL_SOURCE : "https://github.com/BailinT/kernel_xiaomi_cepheus.git"
       KERNEL_BRANCH : "sixteen"
 
       CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
