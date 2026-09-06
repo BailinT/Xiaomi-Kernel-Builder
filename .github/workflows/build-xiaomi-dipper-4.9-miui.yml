@@ -27,8 +27,8 @@ jobs:
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
       EXTRA_CMDS : ""
 
-      # 社区维护树（LawRun CAF SDM845 树，4.9.335）
-      KERNEL_SOURCE : "https://github.com/negrroo/LawRun_xiaomi_sdm845_CAF.git"
+      # 社区维护树（BailinT fork LawRun CAF 树，掩码已修）
+      KERNEL_SOURCE : "https://github.com/BailinT/LawRun_xiaomi_sdm845_CAF.git"
       KERNEL_BRANCH : "master"
 
       CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
