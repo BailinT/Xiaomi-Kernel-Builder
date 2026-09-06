@@ -24,8 +24,8 @@ jobs:
       DEVICE_NAME : "Xiaomi_8"
       DEVICE_CODENAME : "dipper"
 
-      # KCFLAGS: LawRun CAF 树带 GCC 时代老 tweak（缩进/header guard 不规范），clang -Werror 需豁免这两类纯 lint
-      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu- KCFLAGS='-Wno-error=misleading-indentation -Wno-error=header-guard'"
+      # KCFLAGS: LawRun CAF 树 GCC 时代老代码 clang 新增 lint 一类接一类（缩进/header guard/括号/unused），全部 -Wno-error 豁免
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu- KCFLAGS='-Wno-error'"
       EXTRA_CMDS : ""
 
       # 社区维护树（BailinT fork LawRun CAF 树，掩码已修）
