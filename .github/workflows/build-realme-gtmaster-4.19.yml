@@ -75,7 +75,7 @@ jobs:
       KERNELSU_SUS_PATCH: "false"
 
       PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
-      PATCHES_BRANCH: "realme-x"
+      PATCHES_BRANCH: "og-realme-419"
 
       SUSFS_FOLDER_FIXED: ""
       SUSFS_PATCH_FIXED: "susfs_fix_og_realme"
