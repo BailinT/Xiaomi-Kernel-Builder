@@ -21,7 +21,7 @@ jobs:
       CCACHE_NOHASHDIR: "true"
       CCACHE_HARDLINK: "true"
 
-      # 三星 Note20 Ultra（SM-N986B/N986N/N9860，exynos9830）：Android-Artisan 社区树，4.19.325
+      # 三星 Note20 Ultra（SM-N986B/N986N/N9860，exynos9830）：Android-Artisan 社区树 main 分支（无 KSU/susfs 预集成，clean_hook 兼容），4.19.325
       # 基座 dtb 唯一（exynos/exynos9830.dtb），机型差异在原厂 dtbo（boot-only 刷法不动 dtbo 分区）
       DEVICE_NAME : "Samsung_Galaxy_Note20_Ultra"
       DEVICE_CODENAME : "r8s"
@@ -30,7 +30,7 @@ jobs:
       EXTRA_CMDS : "LD=ld.lld"
 
       KERNEL_SOURCE : "https://github.com/Android-Artisan/android_kernel_samsung_exynos990.git"
-      KERNEL_BRANCH : "bpf111"
+      KERNEL_BRANCH : "main"
 
       # ZyC-Clang 16：4.19.325 已由 gts7 线验证兼容
       CLANG_SOURCE : "https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260807-release/Clang-16.0.6-20260807.tar.gz"
