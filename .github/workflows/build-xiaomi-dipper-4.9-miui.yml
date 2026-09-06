@@ -143,6 +143,15 @@ jobs:
           echo "[+] ksu_handle_stat call: $(grep -n 'ksu_handle_stat(&dfd' fs/stat.c)"
           echo "[+] filename_lookup decl: $(grep -c 'extern int filename_lookup' fs/stat.c || true)"
 
+      - name: 🩹 Repair namespace.c atime indent (clang -Wmisleading-indentation)
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          # LawRun CAF 树把 if (flags & MS_NOATIME/NODIRATIME) 注释掉后语句行缩进未对齐，clang -Werror 报 misleading
+          sed -i '/\/\/if (flags & MS_NOATIME)/{n;s/^\t\tmnt_flags |= MNT_NOATIME;/\tmnt_flags |= MNT_NOATIME;/}' fs/namespace.c
+          sed -i '/\/\/if (flags & MS_NODIRATIME)/{n;s/^\t\tmnt_flags |= MNT_NODIRATIME;/\tmnt_flags |= MNT_NODIRATIME;/}' fs/namespace.c
+          echo "[+] namespace.c atime indent fixed"
+
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
 
