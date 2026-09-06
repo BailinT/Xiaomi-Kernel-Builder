@@ -140,7 +140,8 @@ runs:
             if [[ "${{ env.PREBUILT_SELINUX }}" == "true" ]]; then
                 find out security scripts -name "flask.h" -path "*selinux*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
                 find out security scripts -name "avc.h" -path "*selinux*" ! -path "*include*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
-                ls security/selinux/include/flask.h 2>/dev/null && echo "[+] flask.h staged." || echo "[-] flask.h still missing."
+                find out security scripts -name "av_permissions.h" -path "*selinux*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
+                ls security/selinux/include/flask.h security/selinux/include/av_permissions.h 2>/dev/null && echo "[+] selinux generated headers staged." || echo "[-] selinux generated headers missing."
             fi
 
             make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" 2>&1|tee error.log
