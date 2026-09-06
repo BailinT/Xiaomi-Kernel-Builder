@@ -31,8 +31,8 @@ jobs:
       KERNEL_SOURCE : "https://github.com/BailinT/kernel_xiaomi_cepheus.git"
       KERNEL_BRANCH : "sixteen"
 
-      CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r530567.git"
-      CLANG_BRANCH : "lineage-21"
+      CLANG_SOURCE : "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-Linux-X64.tar.xz"
+      CLANG_BRANCH : ""
 
       GCC_GNU : false
       GCC_64_SOURCE : "https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git"
