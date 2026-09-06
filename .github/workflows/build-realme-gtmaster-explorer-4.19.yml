@@ -29,8 +29,8 @@ jobs:
       EXTRA_CMDS : ""
 
       # realme 官方开源树（GT Neo2/X50 Pro/GT 大师探索版 AndroidS 合流官方树，4.19.157）
-      KERNEL_SOURCE : "https://github.com/BailinT/realme_GTneo2-X50pro-GTMasterExploratory-AndroidS-kernel-source.git"
-      KERNEL_BRANCH : "master"
+      KERNEL_SOURCE : "https://github.com/bijoyv9/android_kernel_realme_sm8250.git"
+      KERNEL_BRANCH : "phoeniX-AOSP"
 
       # 官方同款工具链 clang-r416183b
       CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
