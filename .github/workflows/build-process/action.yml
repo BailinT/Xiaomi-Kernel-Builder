@@ -132,7 +132,7 @@ runs:
             echo "=Execuate Clang Build="
             echo "======================"
 
-            if [[ "${{ env.BASEBAND_GUARD_ENABLE }}" == "true" ]]; then
+            if [[ "${{ env.BASEBAND_GUARD_ENABLE }}" == "true" ]] || [[ "${{ env.PREBUILT_SELINUX }}" == "true" ]]; then
                 make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" security/selinux/
                 echo "[+] Pre-built SELinux done."
             fi
