@@ -52,7 +52,7 @@ jobs:
       KERNELSU_AUTO_FORK : "resukisu"
 
       SUSFS_ENABLE : true
-      SUSFS_FIXED : false
+      SUSFS_FIXED : true
 
       AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
       AK3_BRANCH : "master"
@@ -73,10 +73,10 @@ jobs:
       KERNELSU_SUS_PATCH: "false"
 
       PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
-      PATCHES_BRANCH: ""
+      PATCHES_BRANCH: "cepheus-4.14"
 
       SUSFS_FOLDER_FIXED: ""
-      SUSFS_PATCH_FIXED: ""
+      SUSFS_PATCH_FIXED: "susfs_fix_cepheus"
 
       REKERNEL_ENABLE: "false"
       DROIDSPACES_ENABLE: "false"
@@ -124,6 +124,13 @@ jobs:
 
       - name: 🔗 Patch for no-kprobe
         uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧩 Fix KSU sepolicy for legacy selinux (type_val_to_struct_array)
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          sed -i 's/type_val_to_struct\b/type_val_to_struct_array/g' drivers/kernelsu/selinux/sepolicy.c || true
+          echo "[+] sepolicy type_val_to_struct_array count: $(grep -c 'type_val_to_struct_array' drivers/kernelsu/selinux/sepolicy.c || true)"
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
