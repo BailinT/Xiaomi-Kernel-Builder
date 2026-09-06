@@ -78,7 +78,7 @@ jobs:
       PATCHES_BRANCH: "realme-x"
 
       SUSFS_FOLDER_FIXED: ""
-      SUSFS_PATCH_FIXED: ""
+      SUSFS_PATCH_FIXED: "susfs_fix_og_realme"
 
       REKERNEL_ENABLE: "false"
       DROIDSPACES_ENABLE: "false"
