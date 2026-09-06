@@ -150,6 +150,13 @@ runs:
                 make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" security/selinux/ || true
                 echo "[+] Pre-built SELinux done."
             fi
+            # BailinT: 第二次 staging——Pre-built make 里 GEN 已产出完整版到 out/（源树 committed 版可能被裁剪，
+            # 如 lunaa include/av_permissions.h 只有部分类，无 FILE__*），必须用 out 版覆盖源树
+            if [[ "${{ env.PREBUILT_SELINUX }}" == "true" ]]; then
+                find out security scripts -name "flask.h" -path "*selinux*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
+                find out security scripts -name "av_permissions.h" -path "*selinux*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
+                ls -la security/selinux/include/av_permissions.h
+            fi
 
             make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" 2>&1|tee error.log
           else
