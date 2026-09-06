@@ -136,6 +136,12 @@ runs:
                 make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" security/selinux/
                 echo "[+] Pre-built SELinux done."
             fi
+            # BailinT: 复制生成头到源码树（KSU 等外部编译单元的 -I 不含 out 路径）
+            if [[ "${{ env.PREBUILT_SELINUX }}" == "true" ]]; then
+                find out security scripts -name "flask.h" -path "*selinux*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
+                find out security scripts -name "avc.h" -path "*selinux*" ! -path "*include*" -exec cp {} security/selinux/include/ \; 2>/dev/null || true
+                ls security/selinux/include/flask.h 2>/dev/null && echo "[+] flask.h staged." || echo "[-] flask.h still missing."
+            fi
 
             make -j$(nproc --all) CC="ccache clang" ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} O=out ARCH="${{ env.KERNEL_ARCH }}" 2>&1|tee error.log
           else
