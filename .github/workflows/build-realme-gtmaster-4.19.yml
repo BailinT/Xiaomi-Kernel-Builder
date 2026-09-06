@@ -94,6 +94,7 @@ jobs:
       KPM_PATCH_SOURCE: ""
 
       BASEBAND_GUARD_ENABLE: "false"
+      PREBUILT_SELINUX: "true"
       BASEBAND_GUARD_BOOT: "false"
 
       GENERATE_DTB: "true"
