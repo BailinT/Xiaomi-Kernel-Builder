@@ -24,8 +24,8 @@ jobs:
       DEVICE_NAME : "Xiaomi_8"
       DEVICE_CODENAME : "dipper"
 
-      # KCFLAGS: LawRun CAF 树 GCC 时代老代码 clang 新增 lint 一类接一类（缩进/header guard/括号/unused），全部 -Wno-error 豁免
-      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu- KCFLAGS='-Wno-error'"
+      # KCFLAGS: LawRun CAF 树 GCC 时代老代码 clang 新增 lint 一类接一类；DefaultError 组必须显式 -Wno-error=<cat>
+      CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu- KCFLAGS='-Wno-error -Wno-error=incompatible-function-pointer-types -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=implicit-int -Wno-error=int-conversion'"
       EXTRA_CMDS : ""
 
       # 社区维护树（BailinT fork LawRun CAF 树，掩码已修）
