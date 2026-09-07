@@ -190,6 +190,8 @@ jobs:
 
       BASEBAND_GUARD_ENABLE: "false"
 
+      PREBUILT_SELINUX: "true"
+
       BASEBAND_GUARD_BOOT: "false"
 
 
