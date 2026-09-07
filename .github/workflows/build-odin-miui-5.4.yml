@@ -115,13 +115,23 @@ jobs:
       - name: ⚙️ Get necessary tools
         uses: ./.github/workflows/build-ready
 
-      - name: 🧩 Apply odin patch (odin_mode 双档电源 + kgsl clamp + adreno OC/掉档 + thermal gates)
+      - name: 🧩 Apply odin overlay (odin_mode 双档电源 + kgsl clamp + adreno OC/掉档 + thermal gates)
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
           git clone https://github.com/BailinT/NonGKI_Kernel_Patches.git -b mi_kernel odin_patches --depth=1
-          patch --fuzz=0 -p1 < odin_patches/odin_5.4_283/odin_phase1_5.4_283.patch
-          grep -q "odin_mode" drivers/misc/Makefile && echo "[+] odin patch applied"
+          # 覆盖式应用（ATK12 odin_patch 同哲学）; 与 clean_hook/KSU setup 改动文件零交集
+          cp -v odin_patches/odin_5.4_283/files/drivers/gpu/msm/kgsl_pwrctrl.c drivers/gpu/msm/
+          cp -v odin_patches/odin_5.4_283/files/drivers/gpu/msm/adreno.c drivers/gpu/msm/
+          cp -v odin_patches/odin_5.4_283/files/drivers/thermal/cpu_cooling.c drivers/thermal/
+          cp -v odin_patches/odin_5.4_283/files/drivers/thermal/devfreq_cooling.c drivers/thermal/
+          cp -v odin_patches/odin_5.4_283/files/drivers/thermal/qcom/cpu_isolate.c drivers/thermal/qcom/
+          cp -v odin_patches/odin_5.4_283/files/drivers/misc/Makefile drivers/misc/
+          cp -v odin_patches/odin_5.4_283/files/drivers/misc/odin_mode.c drivers/misc/
+          grep -q "odin_mode" drivers/misc/Makefile || false
+          grep -q "kgsl_odin_clamp_max" drivers/gpu/msm/kgsl_pwrctrl.c || false
+          grep -q "odin_thermal_drop" drivers/thermal/cpu_cooling.c || false
+          echo "[+] odin overlay applied"
           rm -rf odin_patches
 
       - name: 🪝 Patch Kernel of SUSFS
