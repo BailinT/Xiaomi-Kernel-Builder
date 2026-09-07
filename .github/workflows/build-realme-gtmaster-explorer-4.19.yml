@@ -28,8 +28,8 @@ jobs:
       CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
       EXTRA_CMDS : ""
 
-      # realme 官方开源树（GT Neo2/X50 Pro/GT 大师探索版 AndroidS 合流官方树，4.19.157）
-      KERNEL_SOURCE : "https://github.com/bijoyv9/android_kernel_realme_sm8250.git"
+      # bijoyv9 树 BailinT fork（mmu_notifier.h 枚举缺失修复 81124e12）
+      KERNEL_SOURCE : "https://github.com/BailinT/android_kernel_realme_sm8250-rivena.git"
       KERNEL_BRANCH : "phoeniX-AOSP"
 
       # 官方同款工具链 clang-r416183b
