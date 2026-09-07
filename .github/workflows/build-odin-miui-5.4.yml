@@ -62,8 +62,8 @@ env:
   PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
   PATCHES_BRANCH: "mi_kernel"
 
-  SUSFS_FOLDER_FIXED: "odin_5.4_283"
-  SUSFS_PATCH_FIXED: "odin_phase1_5.4_283"
+  SUSFS_FOLDER_FIXED: "" # odin 功能走 cp overlay（Apply odin overlay step），非 patch 通道
+  SUSFS_PATCH_FIXED: "" # susfs 底补丁对 283 树仅剩 fts 触摸屏 Makefile 两处噪音 .rej（内容树中已存在，无需 fix）
 
   REKERNEL_ENABLE: "false" # 首次构建关闭以减少变量，跑通后可开
   DROIDSPACES_ENABLE: "false"
