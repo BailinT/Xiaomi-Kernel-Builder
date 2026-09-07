@@ -55,7 +55,7 @@ jobs:
       KERNELSU_AUTO_FORK : "resukisu"
 
       SUSFS_ENABLE : true
-      SUSFS_FIXED : false # 5.4.147 首轮无机型 fix patch，.rej 由 BUILD_DEBUGGER 收集后再补
+      SUSFS_FIXED : true # 必须为 true：驱动 NKP 仓库 clone（SUSFS_PATCH_FIXED 通道依赖）；5.4.147 的 fix = susfs_fix_at547
 
       AK3_SOURCE : "https://github.com/BailinT/AnyKernel3.git"
       AK3_BRANCH : "master"
