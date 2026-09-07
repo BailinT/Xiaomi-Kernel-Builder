@@ -78,7 +78,7 @@ jobs:
       PATCHES_SOURCE: "BailinT/NonGKI_Kernel_Patches"
       PATCHES_BRANCH: "realme-x"
 
-      SUSFS_FOLDER_FIXED: ""
+      SUSFS_FOLDER_FIXED: "og-realme-5.4"
       SUSFS_PATCH_FIXED: "susfs_fix_at547"
 
       REKERNEL_ENABLE: "false"
