@@ -70,7 +70,7 @@ jobs:
       PYTHON_VERSION: "3"
 
       PACK_METHOD: "Anykernel3"
-      PACK_KMODULES: "false"
+      PACK_KMODULES: "true" # camera.ko 等模块随 AK3 打包（原厂 vendor 模块 vermagic 不匹配自编内核，须用自编模块）
 
       KERNELSU_METHOD: "shell"
       KERNELSU_SUS_PATCH: "false"
