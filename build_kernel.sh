@@ -27,6 +27,7 @@ if [ ! -f "$DEFCONFIG_PATH" ]; then
 fi
 
 ENABLE_KSU=0
+ENABLE_HWID=0
 TARGET_OS="both"
 
 shift
@@ -34,10 +35,16 @@ shift
 for arg in "$@"; do
     case "$arg" in
         ksu) ENABLE_KSU=1 ;;
+        hwid) ENABLE_HWID=1 ;;
         miui) TARGET_OS="miui" ;;
         aosp) TARGET_OS="aosp" ;;
     esac
 done
+
+if [ "$ENABLE_HWID" -eq 1 ] && [ "$ENABLE_KSU" -ne 1 ]; then
+    echo "[!] hwid 需要和 ksu 一起用（校验版是给出货包用的），当前只给了 hwid。"
+    exit 1
+fi
 
 # ==========================================
 # Configuration & Environment
@@ -103,6 +110,29 @@ if [ "$ENABLE_KSU" -eq 1 ]; then
     echo "KSU_ACTUAL_REF: $(git -C KernelSU rev-parse HEAD)"
     echo "KSU_ACTUAL_VERSION: $((30000 + $(git -C KernelSU rev-list --count HEAD) + 700))"
     echo "[+] KernelSU setup finished."
+fi
+
+# ==========================================
+# HWID allowlist lock (校验版)
+# ==========================================
+if [ "$ENABLE_HWID" -eq 1 ]; then
+    echo "==========================================="
+    echo " [*] Initializing HWID allowlist lock"
+    echo "==========================================="
+    INJECT="$KERNEL_DIR/hwid/inject_hwid_lock.sh"
+    [ -f "$INJECT" ] || { echo "[!] 缺少 $INJECT"; exit 1; }
+    chmod +x "$INJECT"
+    # 注入器会自己校验 allowlist 条目格式并拒绝空表；
+    # HWID_LOCK_DRY_RUN=1 时只打 dmesg 不 panic，绝不能拿它出货。
+    "$INJECT" "$KERNEL_DIR"
+    [ -f "$KERNEL_DIR/init/hwid_lock.c" ] || { echo "[!] hwid_lock.c 没注入进 init/"; exit 1; }
+    grep -q 'hwid_lock.o' "$KERNEL_DIR/init/Makefile" || { echo "[!] init/Makefile 没挂 hwid_lock.o"; exit 1; }
+    if [ -f "$KERNEL_DIR/hwid/DRYRUN" ]; then
+        echo "HWID LOCK: *** DRY RUN —— 这个包不会锁机器，禁止出货 ***"
+    else
+        echo "HWID LOCK: 正式校验版（未授权设备会 panic）"
+    fi
+    echo "[+] HWID lock setup finished."
 fi
 
 # ==========================================
@@ -344,6 +374,9 @@ build_target() {
         local KSU_ZIP_STR="NoKernelSU"
         if [ "$ENABLE_KSU" -eq 1 ]; then
             KSU_ZIP_STR="BakaSU"
+        fi
+        if [ "$ENABLE_HWID" -eq 1 ]; then
+            KSU_ZIP_STR="${KSU_ZIP_STR}-HWID"
         fi
         local GIT_COMMIT_ID=$(git rev-parse --short=8 HEAD 2>/dev/null || echo "unknown")
         local OS_UPPER=$(echo "$OS_TYPE" | tr '[:lower:]' '[:upper:]')

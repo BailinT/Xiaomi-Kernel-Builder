@@ -1,0 +1,6 @@
+# One lowercase HWID per line. Blank lines and lines beginning with # are ignored.
+# 值必须抄 /proc/cmdline 原值（设备端跑 hwid/probe_hwid.sh 核对），
+# 不要抄识别脚本自己格式化过的输出。
+
+# 红米 K40 (alioth, SM8250, androidboot.cpuid) — 2026-10-29 真机 /proc/cmdline 原值
+0xf3790323
