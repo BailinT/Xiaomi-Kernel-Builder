@@ -69,14 +69,39 @@ echo "[*] Setting up ccache in $CCACHE_DIR..."
 mkdir -p "$CCACHE_DIR"
 
 # ==========================================
-# KernelSU Setup
+# KernelSU Setup (BakaSU, non-GKI manual hook)
 # ==========================================
+KSU_REPO="Baka-SU/BakaSU"
+KSU_REF="d5e9e025b8b49155f8014684d64c91742b465f65"
 if [ "$ENABLE_KSU" -eq 1 ]; then
     echo "==========================================="
-    echo " [*] Initializing KernelSU (ReSukiSU) Setup"
+    echo " [*] Initializing KernelSU (BakaSU) Setup"
     echo "==========================================="
-    echo "[*] Downloading and running ReSukiSU remote setup script..."
-    curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash -s 746686390b0cf2256818a97b2f620eadbd079995
+    # BakaSU's manual_hook_check.mk hard-fails the build unless these
+    # ksu_handle_* call sites exist in the source. Patch set taken from
+    # MOSSVENC/MVNonGKIDevices (patches/resukisu/{4.9,4.19}), verified to
+    # apply on this tree with zero rejected hunks.
+    echo "[*] Applying BakaSU manual-hook stubs..."
+    for P in "$KERNEL_DIR/Patches/BakaSU/4.19/0001-fs-stat-ksu-manual-hook.patch" \
+             "$KERNEL_DIR/Patches/BakaSU/4.19/0002-fs-exec-ksu-manual-hook.patch" \
+             "$KERNEL_DIR/Patches/BakaSU/4.19/0003-fs-open-ksu-manual-hook.patch" \
+             "$KERNEL_DIR/Patches/BakaSU/4.19/0004-kernel-reboot-ksu-manual-hook.patch"; do
+        [ -f "$P" ] || { echo "[!] Missing hook patch: $P"; exit 1; }
+        patch -p1 -N --dry-run -F 3 < "$P" >/dev/null 2>&1 \
+            || { echo "[!] Hook patch does not apply cleanly: $P"; exit 1; }
+        patch -p1 -N -F 3 < "$P"
+    done
+    echo "[+] Manual-hook stubs applied."
+
+    echo "[*] Downloading and running BakaSU remote setup script..."
+    curl -LSs "https://raw.githubusercontent.com/${KSU_REPO}/main/kernel/setup.sh" | bash -s "$KSU_REF"
+
+    [ -L drivers/kernelsu ] || { echo "[!] drivers/kernelsu symlink missing after setup.sh"; exit 1; }
+    grep -q 'obj-$(CONFIG_KSU) += kernelsu/' drivers/Makefile \
+        || { echo "[!] drivers/Makefile not wired to kernelsu"; exit 1; }
+
+    echo "KSU_ACTUAL_REF: $(git -C KernelSU rev-parse HEAD)"
+    echo "KSU_ACTUAL_VERSION: $((30000 + $(git -C KernelSU rev-list --count HEAD) + 700))"
     echo "[+] KernelSU setup finished."
 fi
 
@@ -206,11 +231,19 @@ build_target() {
 
     # 2. KernelSU configurations
     if [ "$ENABLE_KSU" -eq 1 ]; then
-        echo "[*] Injecting KernelSU & SUSFS configurations..."
+        echo "[*] Injecting KernelSU configurations (BakaSU manual hook, SUSFS off)..."
         scripts/config --file "${OUT_DIR}/.config" \
             -e KSU \
             -e THREAD_INFO_IN_TASK \
-            -e KSU_SUSFS
+            -e KALLSYMS_ALL \
+            -e KSU_MANUAL_HOOK \
+            -e KSU_MANUAL_HOOK_AUTO_SETUID_HOOK \
+            -e KSU_MANUAL_HOOK_AUTO_INITRC_HOOK \
+            -e KSU_MANUAL_HOOK_AUTO_INPUT_HOOK \
+            -d KSU_TRACEPOINT_HOOK \
+            -d KSU_SUSFS \
+            -d KSU_DEBUG \
+            --set-str CONFIG_KSU_FULL_NAME_FORMAT "%TAG_NAME%-%COMMIT_SHA%@抖音王德发刷机"
     fi
 
     # 3. MIUI configurations
@@ -296,7 +329,7 @@ build_target() {
         # 确定 ZIP 文件名
         local KSU_ZIP_STR="NoKernelSU"
         if [ "$ENABLE_KSU" -eq 1 ]; then
-            KSU_ZIP_STR="ReSukiSU-SuSFS"
+            KSU_ZIP_STR="BakaSU"
         fi
         local GIT_COMMIT_ID=$(git rev-parse --short=8 HEAD 2>/dev/null || echo "unknown")
         local OS_UPPER=$(echo "$OS_TYPE" | tr '[:lower:]' '[:upper:]')
