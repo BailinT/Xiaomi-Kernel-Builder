@@ -231,17 +231,31 @@ build_target() {
 
     # 2. KernelSU configurations
     if [ "$ENABLE_KSU" -eq 1 ]; then
-        echo "[*] Injecting KernelSU configurations (BakaSU manual hook, SUSFS off)..."
+        echo "[*] Injecting KernelSU configurations (BakaSU + SUSFS inline hook)..."
+        # KSU_SUSFS and KSU_MANUAL_HOOK sit in the same Kconfig `choice`, so
+        # SUSFS mode forces MANUAL_HOOK off. This tree needs that: fs/read_write.c
+        # and drivers/input/input.c reference ksu_is_init_rc_hook_enabled /
+        # ksu_is_input_hook_enabled unconditionally, and BakaSU only defines
+        # those static keys in its CONFIG_KSU_SUSFS branch
+        # (kernel/runtime/ksud_integration.c:107-109) -> MANUAL_HOOK mode fails
+        # to link. Item list mirrors a shipping 4.19 alioth BakaSU build.
         scripts/config --file "${OUT_DIR}/.config" \
             -e KSU \
             -e THREAD_INFO_IN_TASK \
             -e KALLSYMS_ALL \
-            -e KSU_MANUAL_HOOK \
-            -e KSU_MANUAL_HOOK_AUTO_SETUID_HOOK \
-            -e KSU_MANUAL_HOOK_AUTO_INITRC_HOOK \
-            -e KSU_MANUAL_HOOK_AUTO_INPUT_HOOK \
+            -e KSU_MULTI_MANAGER_SUPPORT \
+            -e KSU_SUSFS \
+            -e KSU_SUSFS_SUS_PATH \
+            -e KSU_SUSFS_SUS_MOUNT \
+            -e KSU_SUSFS_SUS_KSTAT \
+            -e KSU_SUSFS_SPOOF_UNAME \
+            -e KSU_SUSFS_ENABLE_LOG \
+            -e KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
+            -e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
+            -e KSU_SUSFS_OPEN_REDIRECT \
+            -e KSU_SUSFS_SUS_MAP \
+            -d KSU_MANUAL_HOOK \
             -d KSU_TRACEPOINT_HOOK \
-            -d KSU_SUSFS \
             -d KSU_DEBUG \
             --set-str CONFIG_KSU_FULL_NAME_FORMAT "%TAG_NAME%-%COMMIT_SHA%@抖音王德发刷机"
     fi
