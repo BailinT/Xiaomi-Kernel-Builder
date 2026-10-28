@@ -31,8 +31,21 @@ reboot.c=4；废弃形态裸 `ksu_handle_execve` / `ksu_handle_post_execve` 均 
 
 ## 与 SUSFS 的关系
 
-本目录只解决 BakaSU 自身的 manual hook 要求，**不含 SUSFS 内核侧移植**。
-`build_kernel.sh` 当前把 `CONFIG_KSU_SUSFS` 显式关掉。若要开 SUSFS，需要先有
-4.19 的 susfs backport（上游 `MOSSVENC` 用的是
-`patches/susfs/4.19/susfs-port.patch`），且注意 BakaSU issue #388 就是
-红米 K40 / 4.19 非 GKI / susfs 2.3.0 移植不当导致卡一屏无限重启。
+本目录只解决 BakaSU 自身的 hook 检查要求，**不含 SUSFS 内核侧移植**（树内自带
+`fs/susfs.c` = SUSFS v2.2.0）。
+
+`build_kernel.sh` 走的是 `CONFIG_KSU_SUSFS=y`（SUSFS inline hook）模式，不是
+manual hook 模式，原因是 BakaSU 的 Kconfig 把 `KSU_MANUAL_HOOK` 与 `KSU_SUSFS`
+放在同一个 `choice` 里（互斥），而本树的 `fs/read_write.c:590`、
+`drivers/input/input.c:382` 无条件 extern 了 `ksu_is_init_rc_hook_enabled` /
+`ksu_is_input_hook_enabled` —— 这两个静态键 BakaSU 只在 `CONFIG_KSU_SUSFS` 分支
+定义（`kernel/runtime/ksud_integration.c:107-109`）。实测：开 MANUAL_HOOK 关
+SUSFS 会在 vmlinux 链接阶段报
+`ld.lld: error: undefined symbol: ksu_is_init_rc_hook_enabled`（run 40686317850）。
+
+因此本目录 4 个补丁插入的调用点带 `#ifdef CONFIG_KSU_MANUAL_HOOK` 守卫，在
+SUSFS 模式下**不参与编译**，仅用于满足 `kernel/tools/inline_hook_check.mk` 的
+文本级 hook 检查（它 grep 源码文字，不检查是否编译）。
+
+注意 BakaSU issue #388 就是红米 K40 / 4.19 非 GKI / susfs 2.3.0 移植不当导致
+卡一屏无限重启——本树 SUSFS 侧是 v2.2.0，与 35252 的配对强度【未验】。
