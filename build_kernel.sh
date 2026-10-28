@@ -41,6 +41,10 @@ for arg in "$@"; do
     esac
 done
 
+# 文件开关：workflow_dispatch 只认默认分支上注册过的 workflow 文件（GitHub 限制），
+# 所以在分支上放一个 hwid/ENABLE 也能触发注入，不必先新增 workflow 入口。
+[ -f hwid/ENABLE ] && ENABLE_HWID=1
+
 if [ "$ENABLE_HWID" -eq 1 ] && [ "$ENABLE_KSU" -ne 1 ]; then
     echo "[!] hwid 需要和 ksu 一起用（校验版是给出货包用的），当前只给了 hwid。"
     exit 1
